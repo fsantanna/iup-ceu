@@ -11,13 +11,16 @@ type Event = <
     >
 >
 
-var isButtonEvent = func _(Ihandle*) -> _int {
-    if not evt?Iup        { return _0 }
-    if not evt!Iup?Button { return _0 }
-    return eq [evt!Iup!Button::_int,arg::_int]
+var isButtonEvent = func [e:/Event, but:_(Ihandle*)] -> _int {
+    output std _1:_int
+    if not arg.e\?Iup        { return _0 }
+    output std _2:_int
+    if not arg.e\!Iup?Button { return _0 }
+    output std _3:_int
+    return eq [arg.e\!Iup!Button::_int,arg.but::_int]
 }
 
-type Iup = <
+type OIup = <
     Close  = (),
     Open   = (),
     Loop   = (),
@@ -39,53 +42,53 @@ type Iup = <
 native type _{
     int iup_cb_button (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
-        Event evt = { IUP, .Iup={BUTTON, {.Button=self}} };
+        Event evt = { EVENT_IUP, .Iup={EVENT_IUP_BUTTON, {.Button=self}} };
         bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
         return IUP_DEFAULT;
     }
-    void output_iup (Iup arg) {
+    void output_iup (OIup arg) {
         switch (arg.tag) {
-            case CLOSE:
+            case OIUP_CLOSE:
                 IupClose();
                 break;
-            case OPEN:
+            case OIUP_OPEN:
                 IupOpen(NULL, NULL);
                 break;
-            case LOOP:
+            case OIUP_LOOP:
                 IupMainLoop();
                 break;
 
-            case MESSAGE:
+            case OIUP_MESSAGE:
                 IupMessage(arg.Message._1, arg.Message._2);
                 break;
-            case SHOWXY:
+            case OIUP_SHOWXY:
                 IupShowXY(arg.ShowXY._1, arg.ShowXY._2, arg.ShowXY._3);
                 break;
 
-            case APPEND:
+            case OIUP_APPEND:
                 IupAppend(arg.Append._1, arg.Append._2);
                 break;
-            case GETINT:
+            case OIUP_GETINT:
                 *arg.GetInt._3 = IupGetInt(arg.GetInt._1, arg.GetInt._2);
                 break;
-            case SETINT:
+            case OIUP_SETINT:
                 IupSetInt(arg.SetInt._1, arg.SetInt._2, arg.SetInt._3);
                 break;
-            case SETSTR:
+            case OIUP_SETSTR:
                 IupSetAttribute(arg.SetStr._1, arg.SetStr._2, arg.SetStr._3);
                 break;
 
-            case BUTTON:
+            case OIUP_BUTTON:
                 *arg.Button._1 = IupButton(arg.Button._2, NULL);
                 IupSetCallback(*arg.Button._1, "ACTION", (Icallback) iup_cb_button);
                 break;
-            case DIALOG:
+            case OIUP_DIALOG:
                 *arg.Dialog._1 = IupDialog(arg.Dialog._2);
                 break;
-            case HBOX:
+            case OIUP_HBOX:
                 *arg.Hbox = IupHbox(NULL);
                 break;
-            case TEXT:
+            case OIUP_TEXT:
                 *arg.Text = IupText(NULL);
                 break;
 
