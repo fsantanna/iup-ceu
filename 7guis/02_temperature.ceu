@@ -1,0 +1,89 @@
+native _{
+#if 0
+int txt_celcius_cb(Ihandle *self)
+{
+  Ihandle* fahrenheit = IupGetDialogChild(self, "FAHRENHEIT");
+  double value = IupGetDouble(self, "VALUE");;
+
+  value = value * (9./5.) + 32;
+
+  IupSetStrf(fahrenheit, "VALUE", "%.2lf", value);
+
+  return IUP_DEFAULT;
+}
+
+int txt_fahrenheit_cb(Ihandle *self)
+{
+  Ihandle* celcius = IupGetDialogChild(self, "CELCIUS");
+  double value = IupGetDouble(self, "VALUE");;
+
+  value = (value - 32) * (5./9.);
+
+  IupSetStrf(celcius, "VALUE", "%.2lf", value);
+
+  return IUP_DEFAULT;
+}
+
+int main(int argc, char **argv)
+{
+
+  /* Registers callbacks */
+  IupSetCallback(tempC, "VALUECHANGED_CB", (Icallback)txt_celcius_cb);
+  IupSetCallback(tempF, "VALUECHANGED_CB", (Icallback)txt_fahrenheit_cb);
+
+}
+#endif
+}
+
+^"int.ceu"
+^"iup.ceu"
+
+output iup OIup.Open
+
+spawn {
+    var labelC: _(Ihandle*)
+    var labelF: _(Ihandle*)
+    {
+        output iup OIup.Label [/labelC, _("Celsius =")]
+        output iup OIup.Label [/labelF, _("Fahrenheit")]
+    }
+
+    var tempC: _(Ihandle*) {
+        output iup OIup.Text   /tempC
+        output iup OIup.SetStr [tempC, _("SIZE"), _("50")]
+        output iup OIup.SetStr [tempC, _("NAME"), _("CELCIUS")]
+        output iup OIup.SetStr [tempC, _("MASK"), _IUP_MASK_FLOAT]
+        output iup OIup.SetStr [tempC, _("VALUE"), _("")]
+    }
+
+    var tempF: _(Ihandle*) {
+        output iup OIup.Text   /tempF
+        output iup OIup.SetStr [tempF, _("SIZE"), _("50")]
+        output iup OIup.SetStr [tempF, _("NAME"), _("FAHRENHEIT")]
+        output iup OIup.SetStr [tempF, _("MASK"), _IUP_MASK_FLOAT]
+        output iup OIup.SetStr [tempF, _("VALUE"), _("")]
+    }
+
+    var hbox: _(Ihandle*) {
+        output iup OIup.HBox   /hbox
+        output iup OIup.Append [hbox, tempC]
+        output iup OIup.Append [hbox, labelC]
+        output iup OIup.Append [hbox, tempF]
+        output iup OIup.Append [hbox, labelF]
+        output iup OIup.SetStr [hbox, _("MARGIN"), _("10x10")]
+        output iup OIup.SetStr [hbox, _("GAP"), _("10")]
+        output iup OIup.SetStr [hbox, _("ALIGNMENT"), _("ACENTER")]
+    }
+
+    var dlg: _(Ihandle*) {
+        output iup OIup.Dialog [/dlg, hbox]
+        output iup OIup.SetStr [hbox, _("TITLE"), _("Temperature")]
+    }
+
+    output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    await _0
+}
+
+output iup OIup.Loop
+output iup OIup.Close
+
