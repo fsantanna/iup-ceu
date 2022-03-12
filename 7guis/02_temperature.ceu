@@ -36,6 +36,7 @@ int main(int argc, char **argv)
 }
 
 ^"int.ceu"
+^"long.ceu"
 ^"iup.ceu"
 
 output iup OIup.Open
@@ -81,7 +82,20 @@ spawn {
     }
 
     output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
-    await _0
+
+    par {
+        every isEventText [/evt,tempC] {
+            var v: _float
+            output iup OIup.GetFloat [tempC, _("VALUE"), /v]
+            output iup OIup.SetFloat [tempF, _("VALUE"), v]
+        }
+    } with {
+        every isEventText [/evt,tempF] {
+            var v: _float
+            output iup OIup.GetFloat [tempF, _("VALUE"), /v]
+            output iup OIup.SetFloat [tempC, _("VALUE"), v]
+        }
+    }
 }
 
 output iup OIup.Loop

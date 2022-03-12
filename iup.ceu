@@ -7,40 +7,55 @@ type Event = <
     Task = _uint64_t,
     None = (),
     Iup  = <
-        Button = _(Ihandle*)
+        Button = _(Ihandle*),
+        Text   = _(Ihandle*)
     >
 >
 
 var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
     if not arg.e\?Iup        { return _0 }
     if not arg.e\!Iup?Button { return _0 }
-    return eq [arg.e\!Iup!Button::_int,arg.but::_int]
+    return leq [arg.e\!Iup!Button::_long,arg.but::_long]
+}
+
+var isEventText = func [e:/Event, txt:_(Ihandle*)] -> _int {
+    if not arg.e\?Iup      { return _0 }
+    if not arg.e\!Iup?Text { return _0 }
+    return (leq [arg.e\!Iup!Text::_long,arg.txt::_long]) :: _int
 }
 
 type OIup = <
-    Close   = (),
-    Open    = (),
-    Loop    = (),
+    Close    = (),
+    Open     = (),
+    Loop     = (),
 
-    Message = [_(char*), _(char*)],
-    ShowXY  = [_(Ihandle*), _int, _int],
+    Message  = [_(char*), _(char*)],
+    ShowXY   = [_(Ihandle*), _int, _int],
 
-    Append  = [_(Ihandle*), _(Ihandle*)],
-    GetInt  = [_(Ihandle*), _(char*), /_int],
-    SetInt  = [_(Ihandle*), _(char*), _int],
-    SetStr  = [_(Ihandle*), _(char*), _(char*)],
+    Append   = [_(Ihandle*), _(Ihandle*)],
+    GetFloat = [_(Ihandle*), _(char*), /_float],
+    GetInt   = [_(Ihandle*), _(char*), /_int],
+    SetFloat = [_(Ihandle*), _(char*), _float],
+    SetInt   = [_(Ihandle*), _(char*), _int],
+    SetStr   = [_(Ihandle*), _(char*), _(char*)],
 
-    Button  = [/_(Ihandle*), _(char*)],
-    Dialog  = [/_(Ihandle*), _(Ihandle*)],
-    HBox    = /_(Ihandle*),
-    Label   = [/_(Ihandle*), _(char*)],
-    Text    = /_(Ihandle*)
+    Button   = [/_(Ihandle*), _(char*)],
+    Dialog   = [/_(Ihandle*), _(Ihandle*)],
+    HBox     = /_(Ihandle*),
+    Label    = [/_(Ihandle*), _(char*)],
+    Text     = /_(Ihandle*)
 >
 
 native type _{
     int iup_cb_button (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
         Event evt = { EVENT_IUP, .Iup={EVENT_IUP_BUTTON, {.Button=self}} };
+        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        return IUP_DEFAULT;
+    }
+    int iup_cb_text (Ihandle* self) {
+        Stack stk = { NULL, NULL, GLOBAL };
+        Event evt = { EVENT_IUP, .Iup={EVENT_IUP_TEXT, {.Text=self}} };
         bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
         return IUP_DEFAULT;
     }
@@ -66,8 +81,14 @@ native type _{
             case OIUP_APPEND:
                 IupAppend(arg.Append._1, arg.Append._2);
                 break;
+            case OIUP_GETFLOAT:
+                *arg.GetFloat._3 = IupGetFloat(arg.GetFloat._1, arg.GetFloat._2);
+                break;
             case OIUP_GETINT:
                 *arg.GetInt._3 = IupGetInt(arg.GetInt._1, arg.GetInt._2);
+                break;
+            case OIUP_SETFLOAT:
+                IupSetFloat(arg.SetFloat._1, arg.SetFloat._2, arg.SetFloat._3);
                 break;
             case OIUP_SETINT:
                 IupSetInt(arg.SetInt._1, arg.SetInt._2, arg.SetInt._3);
@@ -91,6 +112,7 @@ native type _{
                 break;
             case OIUP_TEXT:
                 *arg.Text = IupText(NULL);
+                IupSetCallback(*arg.Text, "VALUECHANGED_CB", (Icallback) iup_cb_text);
                 break;
 
             default:

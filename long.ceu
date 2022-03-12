@@ -1,0 +1,66 @@
+-- LOGICAL
+
+var lnot = func _long -> _long {
+    return _(!$arg)
+}
+
+var land = func [_long,_long] -> _long {
+    return _($arg._1 && $arg._2)
+}
+
+var lor = func [_long,_long] -> _long {
+    return _($arg._1 || $arg._2)
+}
+
+-- RELATIONAL
+
+var leq = func [_long,_long] -> _long {
+    return _($arg._1 == $arg._2)
+}
+
+var lneq = func [_long,_long] -> _long {
+    return _($arg._1 != $arg._2)
+}
+
+var lgt = func [_long,_long] -> _long {
+    return _($arg._1 > $arg._2)
+}
+
+var llt = func [_long,_long] -> _long {
+    return _($arg._1 < $arg._2)
+}
+
+
+var lgte = func [_long,_long] -> _long {
+    return _($arg._1 >= $arg._2)
+}
+
+var llte = func [_long,_long] -> _long {
+    return _($arg._1 <= $arg._2)
+}
+
+-- ARITHMETIC
+
+var lumn = func _long -> _long {
+    return _(-$arg)
+}
+
+var ladd = func [_long,_long] -> _long {
+    return _($arg._1 + $arg._2)
+}
+
+var lsub = func [_long,_long] -> _long {
+    return _($arg._1 - $arg._2)
+}
+
+var lmul = func [_long,_long] -> _long {
+    return _($arg._1 * $arg._2)
+}
+
+var ldiv = func [_long,_long] -> _long {
+    return _($arg._1 / $arg._2)
+}
+
+var lrem = func [_long,_long] -> _long {
+    return _($arg._1 % $arg._2)
+}

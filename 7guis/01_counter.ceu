@@ -1,4 +1,5 @@
 ^"int.ceu"
+^"long.ceu"
 ^"iup.ceu"
 
 output iup OIup.Open
@@ -32,12 +33,10 @@ spawn {
 
     output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
-    --every isEventButton(button) {
-    loop {
-        await isEventButton [/evt,button]
-        var value: _int
-        output iup OIup.GetInt [text, _("VALUE"), /value]
-        output iup OIup.SetInt [text, _("VALUE"), add [value,_1]]
+    every isEventButton [/evt,button] {
+        var v: _int
+        output iup OIup.GetInt [text, _("VALUE"), /v]
+        output iup OIup.SetInt [text, _("VALUE"), add [v,_1]]
     }
 }
 
