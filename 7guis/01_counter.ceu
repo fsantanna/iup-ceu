@@ -18,7 +18,7 @@ spawn {
     }
 
     var hbox: _(Ihandle*) {
-        output iup OIup.Hbox   /hbox
+        output iup OIup.HBox   /hbox
         output iup OIup.Append [hbox, text]
         output iup OIup.Append [hbox, button]
         output iup OIup.SetStr [hbox, _("MARGIN"), _("10x10")]

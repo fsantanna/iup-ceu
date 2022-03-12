@@ -32,7 +32,8 @@ type OIup = <
 
     Button  = [/_(Ihandle*), _(char*)],
     Dialog  = [/_(Ihandle*), _(Ihandle*)],
-    Hbox    = /_(Ihandle*),
+    HBox    = /_(Ihandle*),
+    Label   = [/_(Ihandle*), _(char*)],
     Text    = /_(Ihandle*)
 >
 
@@ -83,7 +84,10 @@ native type _{
                 *arg.Dialog._1 = IupDialog(arg.Dialog._2);
                 break;
             case OIUP_HBOX:
-                *arg.Hbox = IupHbox(NULL);
+                *arg.HBox = IupHbox(NULL);
+                break;
+            case OIUP_LABEL:
+                *arg.Label._1 = IupLabel(arg.Label._2);
                 break;
             case OIUP_TEXT:
                 *arg.Text = IupText(NULL);
