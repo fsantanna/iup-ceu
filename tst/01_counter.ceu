@@ -32,15 +32,12 @@ spawn {
 
     output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
-    --every isButtonEvent(button) {
+    --every isEventButton(button) {
     loop {
-        await _1
-        output std /evt
-        if isButtonEvent [/evt,button] {
-            var value: _int
-            output iup OIup.GetInt [text, _("VALUE"), /value]
-            output iup OIup.SetInt [text, _("VALUE"), add [value,_1]]
-        }
+        await isEventButton [/evt,button]
+        var value: _int
+        output iup OIup.GetInt [text, _("VALUE"), /value]
+        output iup OIup.SetInt [text, _("VALUE"), add [value,_1]]
     }
 }
 

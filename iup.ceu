@@ -11,27 +11,24 @@ type Event = <
     >
 >
 
-var isButtonEvent = func [e:/Event, but:_(Ihandle*)] -> _int {
-    output std _1:_int
+var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
     if not arg.e\?Iup        { return _0 }
-    output std _2:_int
     if not arg.e\!Iup?Button { return _0 }
-    output std _3:_int
     return eq [arg.e\!Iup!Button::_int,arg.but::_int]
 }
 
 type OIup = <
-    Close  = (),
-    Open   = (),
-    Loop   = (),
+    Close   = (),
+    Open    = (),
+    Loop    = (),
 
     Message = [_(char*), _(char*)],
     ShowXY  = [_(Ihandle*), _int, _int],
 
-    Append = [_(Ihandle*), _(Ihandle*)],
-    GetInt = [_(Ihandle*), _(char*), /_int],
-    SetInt = [_(Ihandle*), _(char*), _int],
-    SetStr = [_(Ihandle*), _(char*), _(char*)],
+    Append  = [_(Ihandle*), _(Ihandle*)],
+    GetInt  = [_(Ihandle*), _(char*), /_int],
+    SetInt  = [_(Ihandle*), _(char*), _int],
+    SetStr  = [_(Ihandle*), _(char*), _(char*)],
 
     Button  = [/_(Ihandle*), _(char*)],
     Dialog  = [/_(Ihandle*), _(Ihandle*)],
