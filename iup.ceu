@@ -11,6 +11,12 @@ type Event = <
     >
 >
 
+var isButtonEvent = func _(Ihandle*) -> _int {
+    if not evt?Iup        { return _0 }
+    if not evt!Iup?Button { return _0 }
+    return eq [evt!Iup!Button::_int,arg::_int]
+}
+
 type Iup = <
     Close  = (),
     Open   = (),
@@ -20,6 +26,7 @@ type Iup = <
     ShowXY  = [_(Ihandle*), _int, _int],
 
     Append = [_(Ihandle*), _(Ihandle*)],
+    GetInt = [_(Ihandle*), _(char*), /_int],
     SetInt = [_(Ihandle*), _(char*), _int],
     SetStr = [_(Ihandle*), _(char*), _(char*)],
 
@@ -32,7 +39,7 @@ type Iup = <
 native type _{
     int iup_cb_button (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
-        Event evt = { IUP, .Iup = self };
+        Event evt = { IUP, .Iup={BUTTON, {.Button=self}} };
         bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
         return IUP_DEFAULT;
     }
@@ -57,6 +64,9 @@ native type _{
 
             case APPEND:
                 IupAppend(arg.Append._1, arg.Append._2);
+                break;
+            case GETINT:
+                *arg.GetInt._3 = IupGetInt(arg.GetInt._1, arg.GetInt._2);
                 break;
             case SETINT:
                 IupSetInt(arg.SetInt._1, arg.SetInt._2, arg.SetInt._3);

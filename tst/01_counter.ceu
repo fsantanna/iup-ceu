@@ -27,6 +27,7 @@ spawn {
         output iup Iup.Button [/button, _("Count")]
         output iup Iup.SetStr [button,  _("SIZE"), _("60")]
     }
+
     var text: _(Ihandle*) {
         output iup Iup.Text   /text
         output iup Iup.SetStr [text, _("SIZE"),     _("60")]
@@ -34,6 +35,7 @@ spawn {
         output iup Iup.SetStr [text, _("READONLY"), _("YES")]
         output iup Iup.SetInt [text, _("VALUE"),    _0]
     }
+
     var hbox: _(Ihandle*) {
         output iup Iup.Hbox   /hbox
         output iup Iup.Append [hbox, text]
@@ -41,6 +43,7 @@ spawn {
         output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
         output iup Iup.SetStr [hbox, _("GAP"),    _("10")]
     }
+
     var dlg: _(Ihandle*) {
         output iup Iup.Dialog [/dlg, hbox]
         output iup Iup.SetStr [hbox, _("TITLE"), _("Counter")]
@@ -48,17 +51,11 @@ spawn {
 
     output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
-    --every _1 {
-    --    output std ()
-    --}
-
-    every click {
-        output std ()
-    } where {
-        var click = and [evt?Iup::_int, eq [evt!Iup::_int,button::_int] ]
+    every isButtonEvent(button) {
+        output iup Iup.GetInt [text, _("VALUE"), /value]
+        output iup Iup.SetInt [text, _("VALUE"), add [value,_1]]
     }
 
     await _0
 }
-emit @GLOBAL Event.None
 output iup Iup.Loop
