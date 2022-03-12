@@ -52,7 +52,6 @@ spawn {
     var tempC: _(Ihandle*) {
         output iup OIup.Text   /tempC
         output iup OIup.SetStr [tempC, _("SIZE"), _("50")]
-        output iup OIup.SetStr [tempC, _("NAME"), _("CELCIUS")]
         output iup OIup.SetStr [tempC, _("MASK"), _IUP_MASK_FLOAT]
         output iup OIup.SetStr [tempC, _("VALUE"), _("")]
     }
@@ -60,7 +59,6 @@ spawn {
     var tempF: _(Ihandle*) {
         output iup OIup.Text   /tempF
         output iup OIup.SetStr [tempF, _("SIZE"), _("50")]
-        output iup OIup.SetStr [tempF, _("NAME"), _("FAHRENHEIT")]
         output iup OIup.SetStr [tempF, _("MASK"), _IUP_MASK_FLOAT]
         output iup OIup.SetStr [tempF, _("VALUE"), _("")]
     }
@@ -87,13 +85,13 @@ spawn {
         every isEventText [/evt,tempC] {
             var v: _float
             output iup OIup.GetFloat [tempC, _("VALUE"), /v]
-            output iup OIup.SetFloat [tempF, _("VALUE"), v]
+            output iup OIup.SetStrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
         }
     } with {
         every isEventText [/evt,tempF] {
             var v: _float
             output iup OIup.GetFloat [tempF, _("VALUE"), /v]
-            output iup OIup.SetFloat [tempC, _("VALUE"), v]
+            output iup OIup.SetStrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
         }
     }
 }

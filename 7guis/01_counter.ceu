@@ -13,7 +13,6 @@ spawn {
     var text: _(Ihandle*) {
         output iup OIup.Text   /text
         output iup OIup.SetStr [text, _("SIZE"),     _("60")]
-        output iup OIup.SetStr [text, _("NAME"),     _("TEXT")]
         output iup OIup.SetStr [text, _("READONLY"), _("YES")]
         output iup OIup.SetInt [text, _("VALUE"),    _0]
     }

@@ -38,11 +38,13 @@ type OIup = <
     SetFloat = [_(Ihandle*), _(char*), _float],
     SetInt   = [_(Ihandle*), _(char*), _int],
     SetStr   = [_(Ihandle*), _(char*), _(char*)],
+    SetStrF  = [_(Ihandle*), _(char*), _(char*), _float],
 
     Button   = [/_(Ihandle*), _(char*)],
     Dialog   = [/_(Ihandle*), _(Ihandle*)],
     HBox     = /_(Ihandle*),
     Label    = [/_(Ihandle*), _(char*)],
+    List     = /_(Ihandle*),
     Text     = /_(Ihandle*)
 >
 
@@ -96,6 +98,9 @@ native type _{
             case OIUP_SETSTR:
                 IupSetAttribute(arg.SetStr._1, arg.SetStr._2, arg.SetStr._3);
                 break;
+            case OIUP_SETSTRF:
+                IupSetStrf(arg.SetStrF._1, arg.SetStrF._2, arg.SetStrF._3, arg.SetStrF._4);
+                break;
 
             case OIUP_BUTTON:
                 *arg.Button._1 = IupButton(arg.Button._2, NULL);
@@ -109,6 +114,10 @@ native type _{
                 break;
             case OIUP_LABEL:
                 *arg.Label._1 = IupLabel(arg.Label._2);
+                break;
+            case OIUP_LIST:
+                *arg.List = IupList(NULL);
+                //IupSetCallback(*arg.List, "VALUECHANGED_CB", (Icallback) iup_cb_text);
                 break;
             case OIUP_TEXT:
                 *arg.Text = IupText(NULL);
