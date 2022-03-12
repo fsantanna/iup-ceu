@@ -1,0 +1,86 @@
+native type _{
+    #include <iup.h>
+}
+
+type Event = <
+    Kill = (),
+    Task = _uint64_t,
+    None = (),
+    Iup  = <
+        Button = _(Ihandle*)
+    >
+>
+
+type Iup = <
+    Close  = (),
+    Open   = (),
+    Loop   = (),
+
+    Message = [_(char*), _(char*)],
+    ShowXY  = [_(Ihandle*), _int, _int],
+
+    Append = [_(Ihandle*), _(Ihandle*)],
+    SetInt = [_(Ihandle*), _(char*), _int],
+    SetStr = [_(Ihandle*), _(char*), _(char*)],
+
+    Button  = [/_(Ihandle*), _(char*)],
+    Dialog  = [/_(Ihandle*), _(Ihandle*)],
+    Hbox    = /_(Ihandle*),
+    Text    = /_(Ihandle*)
+>
+
+native type _{
+    int iup_cb_button (Ihandle* self) {
+        Stack stk = { NULL, NULL, GLOBAL };
+        Event evt = { IUP, .Iup = self };
+        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        return IUP_DEFAULT;
+    }
+    void output_iup (Iup arg) {
+        switch (arg.tag) {
+            case CLOSE:
+                IupClose();
+                break;
+            case OPEN:
+                IupOpen(NULL, NULL);
+                break;
+            case LOOP:
+                IupMainLoop();
+                break;
+
+            case MESSAGE:
+                IupMessage(arg.Message._1, arg.Message._2);
+                break;
+            case SHOWXY:
+                IupShowXY(arg.ShowXY._1, arg.ShowXY._2, arg.ShowXY._3);
+                break;
+
+            case APPEND:
+                IupAppend(arg.Append._1, arg.Append._2);
+                break;
+            case SETINT:
+                IupSetInt(arg.SetInt._1, arg.SetInt._2, arg.SetInt._3);
+                break;
+            case SETSTR:
+                IupSetAttribute(arg.SetStr._1, arg.SetStr._2, arg.SetStr._3);
+                break;
+
+            case BUTTON:
+                *arg.Button._1 = IupButton(arg.Button._2, NULL);
+                IupSetCallback(*arg.Button._1, "ACTION", (Icallback) iup_cb_button);
+                break;
+            case DIALOG:
+                *arg.Dialog._1 = IupDialog(arg.Dialog._2);
+                break;
+            case HBOX:
+                *arg.Hbox = IupHbox(NULL);
+                break;
+            case TEXT:
+                *arg.Text = IupText(NULL);
+                break;
+
+            default:
+                assert(0 && "missing IUP operation");
+        }
+    }
+}

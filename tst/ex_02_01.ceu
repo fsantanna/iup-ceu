@@ -1,0 +1,18 @@
+^"iup.ceu"
+
+native _{
+    #include <iup.h>
+    IupOpen(NULL,NULL);
+    IupClose();
+}
+
+spawn {
+    output iup Iup.Open
+    defer {
+        output iup Iup.Close
+    }
+    var msg: _(Ihandle*) {
+        output iup Iup.Message [_("Hello World 1"), _("Hello world from IUP.")]
+    }
+    output iup Iup.Loop
+}

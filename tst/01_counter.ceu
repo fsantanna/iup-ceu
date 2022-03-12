@@ -1,0 +1,64 @@
+^"int.ceu"
+^"iup.ceu"
+
+native _{
+    int btn_count_cb( Ihandle *self )
+    {
+        Ihandle* text = IupGetDialogChild(self, "TEXT");
+        int value = IupGetInt(text, "VALUE");
+        IupSetInt(text, "VALUE", ++value);
+
+        return IUP_DEFAULT;
+    }
+
+    Ihandle *dlg, *button, *text, *hbox;
+
+    /* Registers callbacks */
+    //IupSetCallback(button, "ACTION", (Icallback) btn_count_cb);
+}
+
+spawn {
+    output iup Iup.Open
+    defer {
+        output iup Iup.Close
+    }
+
+    var button: _(Ihandle*) {
+        output iup Iup.Button [/button, _("Count")]
+        output iup Iup.SetStr [button,  _("SIZE"), _("60")]
+    }
+    var text: _(Ihandle*) {
+        output iup Iup.Text   /text
+        output iup Iup.SetStr [text, _("SIZE"),     _("60")]
+        output iup Iup.SetStr [text, _("NAME"),     _("TEXT")]
+        output iup Iup.SetStr [text, _("READONLY"), _("YES")]
+        output iup Iup.SetInt [text, _("VALUE"),    _0]
+    }
+    var hbox: _(Ihandle*) {
+        output iup Iup.Hbox   /hbox
+        output iup Iup.Append [hbox, text]
+        output iup Iup.Append [hbox, button]
+        output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
+        output iup Iup.SetStr [hbox, _("GAP"),    _("10")]
+    }
+    var dlg: _(Ihandle*) {
+        output iup Iup.Dialog [/dlg, hbox]
+        output iup Iup.SetStr [hbox, _("TITLE"), _("Counter")]
+    }
+
+    output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+
+    --every _1 {
+    --    output std ()
+    --}
+
+    every click {
+        output std ()
+    } where {
+        var click = and [evt?Iup::_int, eq [evt!Iup::_int,button::_int] ]
+    }
+
+    await _0
+}
+emit @GLOBAL Event.None
+output iup Iup.Loop
