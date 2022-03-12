@@ -1,0 +1,63 @@
+^"int.ceu"
+^"long.ceu"
+^"iup.ceu"
+
+output iup OIup.Open
+
+spawn {
+    var button: _(Ihandle*) {
+        output iup OIup.Button [/button, _("Book")]
+        output iup OIup.SetStr [button,  _("EXPAND"), _("HORIZONTAL")]
+    }
+
+    var list: _(Ihandle*) {
+        output iup OIup.List /list
+        output iup OIup.SetStr [list, _("EXPAND"), _("HORIZONTAL")]
+        output iup OIup.SetStr [list, _("DROPDOWN"), _("YES")]
+        output iup OIup.SetStr [list, _("1"), _("one-way flight")]
+        output iup OIup.SetStr [list, _("2"), _("return flight")]
+        output iup OIup.SetStr [list, _("VALUE"), _("1")]
+    }
+
+    var startDate: _(Ihandle*) {
+        output iup OIup.Text   /startDate
+        output iup OIup.SetStr [startDate, _("EXPAND"), _("HORIZONTAL")]
+        output iup OIup.SetStr [startDate, _("VALUE"), _("22.09.1957")]
+        output iup OIup.SetStr [startDate, _("DAY"), _("22")]
+        output iup OIup.SetStr [startDate, _("MONTH"), _("09")]
+        output iup OIup.SetStr [startDate, _("YEAR"), _("1957")]
+        output iup OIup.SetStr [startDate, _("VALID"), _("YES")]
+    }
+
+    var endDate: _(Ihandle*) {
+        output iup OIup.Text   /endDate
+        output iup OIup.SetStr [endDate, _("EXPAND"), _("HORIZONTAL")]
+        output iup OIup.SetStr [endDate, _("VALUE"), _("22.09.1957")]
+        output iup OIup.SetStr [endDate, _("DAY"), _("22")]
+        output iup OIup.SetStr [endDate, _("MONTH"), _("09")]
+        output iup OIup.SetStr [endDate, _("YEAR"), _("1957")]
+        output iup OIup.SetStr [endDate, _("VALID"), _("YES")]
+        output iup OIup.SetStr [endDate, _("ACTIVE"), _("NO")]
+    }
+
+    var vbox: _(Ihandle*) {
+        output iup OIup.HBox   /vbox
+        output iup OIup.Append [vbox, list]
+        output iup OIup.Append [vbox, startDate]
+        output iup OIup.Append [vbox, endDate]
+        output iup OIup.Append [vbox, button]
+        output iup OIup.SetStr [vbox, _("MARGIN"), _("10x10")]
+        output iup OIup.SetStr [vbox, _("GAP"),    _("10")]
+    }
+
+    var dlg: _(Ihandle*) {
+        output iup OIup.Dialog [/dlg, vbox]
+        output iup OIup.SetStr [vbox, _("TITLE"), _("Book Flight")]
+        output iup OIup.SetStr [vbox, _("SIZE"), _("150")]
+    }
+
+    output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+}
+
+output iup OIup.Loop
+output iup OIup.Close
