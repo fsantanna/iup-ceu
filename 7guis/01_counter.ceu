@@ -2,42 +2,42 @@
 ^"long.ceu"
 ^"iup.ceu"
 
-output iup OIup.Open
+output iup Iup.Open
 
 spawn {
     var button: _(Ihandle*) {
-        output iup OIup.Button [/button, _("Count")]
-        output iup OIup.SetStr [button,  _("SIZE"), _("60")]
+        output iup Iup.Button [/button, _("Count")]
+        output iup Iup.SetStr [button,  _("SIZE"), _("60")]
     }
 
     var text: _(Ihandle*) {
-        output iup OIup.Text   /text
-        output iup OIup.SetStr [text, _("SIZE"),     _("60")]
-        output iup OIup.SetStr [text, _("READONLY"), _("YES")]
-        output iup OIup.SetInt [text, _("VALUE"),    _0]
+        output iup Iup.Text   /text
+        output iup Iup.SetStr [text, _("SIZE"),     _("60")]
+        output iup Iup.SetStr [text, _("READONLY"), _("YES")]
+        output iup Iup.SetInt [text, _("VALUE"),    _0]
     }
 
     var hbox: _(Ihandle*) {
-        output iup OIup.HBox   /hbox
-        output iup OIup.Append [hbox, text]
-        output iup OIup.Append [hbox, button]
-        output iup OIup.SetStr [hbox, _("MARGIN"), _("10x10")]
-        output iup OIup.SetStr [hbox, _("GAP"),    _("10")]
+        output iup Iup.HBox   /hbox
+        output iup Iup.Append [hbox, text]
+        output iup Iup.Append [hbox, button]
+        output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
+        output iup Iup.SetStr [hbox, _("GAP"),    _("10")]
     }
 
     var dlg: _(Ihandle*) {
-        output iup OIup.Dialog [/dlg, hbox]
-        output iup OIup.SetStr [hbox, _("TITLE"), _("Counter")]
+        output iup Iup.Dialog [/dlg, hbox]
+        output iup Iup.SetStr [hbox, _("TITLE"), _("Counter")]
     }
 
-    output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
     every isEventButton [/evt,button] {
         var v: _int
-        output iup OIup.GetInt [text, _("VALUE"), /v]
-        output iup OIup.SetInt [text, _("VALUE"), add [v,_1]]
+        output iup Iup.GetInt [text, _("VALUE"), /v]
+        output iup Iup.SetInt [text, _("VALUE"), add [v,_1]]
     }
 }
 
-output iup OIup.Loop
-output iup OIup.Close
+output iup Iup.Loop
+output iup Iup.Close
