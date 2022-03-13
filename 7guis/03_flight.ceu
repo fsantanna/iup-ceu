@@ -2,14 +2,92 @@
 ^"long.ceu"
 ^"iup.ceu"
 
+native type _{
+    int validateDate(int day, int month, int year)
+    {
+        int leapYear = 0;
+
+        if (day < 1)
+            return 0;
+
+        if (year % 400 == 0 || year % 4 == 0 && year % 100 != 0)
+            leapYear = 1;
+
+        if (month == 2 && leapYear && day > 29)
+            return 0;
+
+        if (month == 2 && !leapYear && day > 28)
+            return 0;
+
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
+            return 0;
+
+        if ((month == 1 || month == 3 || month == 5 || month == 7 ||
+            month == 8 || month == 10 || month == 12) && day > 31)
+            return 0;
+
+        return 1;
+    }
+
+    int parseDate (char* date, int* day, int* month, int* year) {
+        char *part, *ret;
+        int count = 1;
+
+        part = strtok(date, ".");
+        if (part == NULL) {
+            return 0;
+        }
+
+        while (part != NULL)
+        {
+            int len = strlen(part);
+            switch (count)
+            {
+                case 1:
+                    if (strlen(part) > 2) {
+                        return 0;
+                    }
+                    *day = strtol(part, &ret, 10);
+                    if (*ret != '\0') {
+                        return 0;
+                    }
+                    break;
+                case 2:
+                    if (strlen(part) > 2) {
+                        return 0;
+                    }
+                    *month = strtol(part, &ret, 10);
+                    if (*ret != '\0') {
+                        return 0;
+                    }
+                    break;
+                case 3:
+                    if (strlen(part) != 4) {
+                        return 0;
+                    }
+                    *year = strtol(part, &ret, 10);
+                    if (*ret != '\0') {
+                        return 0;
+                    }
+                    break;
+                default:
+                    return 0;
+            }
+            count++;
+            part = strtok(NULL, ".");
+        }
+
+        if (count < 4) {
+            return 0;
+        }
+
+        return validateDate(*day, *month, *year);
+    }
+}
+
 output iup OIup.Open
 
 spawn {
-    var button: _(Ihandle*) {
-        output iup OIup.Button [/button, _("Book")]
-        output iup OIup.SetStr [button,  _("EXPAND"), _("HORIZONTAL")]
-    }
-
     var list: _(Ihandle*) {
         output iup OIup.List /list
         output iup OIup.SetStr [list, _("EXPAND"), _("HORIZONTAL")]
@@ -22,26 +100,31 @@ spawn {
     var startDate: _(Ihandle*) {
         output iup OIup.Text   /startDate
         output iup OIup.SetStr [startDate, _("EXPAND"), _("HORIZONTAL")]
-        output iup OIup.SetStr [startDate, _("VALUE"), _("22.09.1957")]
-        output iup OIup.SetStr [startDate, _("DAY"), _("22")]
-        output iup OIup.SetStr [startDate, _("MONTH"), _("09")]
-        output iup OIup.SetStr [startDate, _("YEAR"), _("1957")]
-        output iup OIup.SetStr [startDate, _("VALID"), _("YES")]
+        output iup OIup.SetStr [startDate, _("VALUE"),  _("22.09.1957")]
+        output iup OIup.SetStr [startDate, _("DAY"),    _("22")]
+        output iup OIup.SetStr [startDate, _("MONTH"),  _("09")]
+        output iup OIup.SetStr [startDate, _("YEAR"),   _("1957")]
+        output iup OIup.SetStr [startDate, _("VALID"),  _("YES")]
     }
 
     var endDate: _(Ihandle*) {
         output iup OIup.Text   /endDate
         output iup OIup.SetStr [endDate, _("EXPAND"), _("HORIZONTAL")]
-        output iup OIup.SetStr [endDate, _("VALUE"), _("22.09.1957")]
-        output iup OIup.SetStr [endDate, _("DAY"), _("22")]
-        output iup OIup.SetStr [endDate, _("MONTH"), _("09")]
-        output iup OIup.SetStr [endDate, _("YEAR"), _("1957")]
-        output iup OIup.SetStr [endDate, _("VALID"), _("YES")]
+        output iup OIup.SetStr [endDate, _("VALUE"),  _("22.09.1957")]
+        output iup OIup.SetStr [endDate, _("DAY"),    _("22")]
+        output iup OIup.SetStr [endDate, _("MONTH"),  _("09")]
+        output iup OIup.SetStr [endDate, _("YEAR"),   _("1957")]
+        output iup OIup.SetStr [endDate, _("VALID"),  _("YES")]
         output iup OIup.SetStr [endDate, _("ACTIVE"), _("NO")]
     }
 
+    var button: _(Ihandle*) {
+        output iup OIup.Button [/button, _("Book")]
+        output iup OIup.SetStr [button,  _("EXPAND"), _("HORIZONTAL")]
+    }
+
     var vbox: _(Ihandle*) {
-        output iup OIup.HBox   /vbox
+        output iup OIup.VBox   /vbox
         output iup OIup.Append [vbox, list]
         output iup OIup.Append [vbox, startDate]
         output iup OIup.Append [vbox, endDate]
@@ -53,10 +136,48 @@ spawn {
     var dlg: _(Ihandle*) {
         output iup OIup.Dialog [/dlg, vbox]
         output iup OIup.SetStr [vbox, _("TITLE"), _("Book Flight")]
-        output iup OIup.SetStr [vbox, _("SIZE"), _("150")]
     }
 
     output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+
+    loop {
+        var isact2: _int
+        var isval2: _int
+        output iup OIup.GetInt [endDate, _("ACTIVE"), /isact2]
+        output iup OIup.GetInt [endDate, _("VALID"),  /isval2]
+
+        if or [isval2, not isact2]  {
+            output iup OIup.SetStr [endDate, _("BGCOLOR"), _("255 255 255")];
+        } else {
+            output iup OIup.SetStr [endDate, _("BGCOLOR"), _("255 0 0")];
+        }
+
+        paror {
+            await isEventList [/evt,list] until evt!Iup!List.state
+            if eq [evt!Iup!List.item, _1] {
+                output iup OIup.SetStr [endDate, _("ACTIVE"), _("NO")]
+            } else {
+                output iup OIup.SetStr [endDate, _("ACTIVE"), _("YES")]
+            }
+        } with {
+            await isEventText [/evt,_NULL]
+            var text = evt!Iup!Text
+            var day:   _int
+            var month: _int
+            var year:  _int
+            var date:  _(char*)
+            output iup OIup.GetStr [text, _("VALUE"), /date]
+            var err: _int = _{parseDate($date, &$day, &$month, &$year)}
+            if err {
+                output iup OIup.SetStr [text, _("VALID"), _("NO")];
+            } else {
+                output iup OIup.SetInt [text, _("DAY"),   day];
+                output iup OIup.SetInt [text, _("MONTH"), month];
+                output iup OIup.SetInt [text, _("YEAR"),  year];
+                output iup OIup.SetStr [text, _("VALID"), _("YES")];
+            }
+        }
+    }
 }
 
 output iup OIup.Loop

@@ -6,8 +6,9 @@ type Event = <
     Kill = (),
     Task = _uint64_t,
     None = (),
-    Iup  = <
+    Iup  = <    -- TODO: inheritance _(Ihandle*) + ...
         Button = _(Ihandle*),
+        List   = [self:_(Ihandle*), text:_(char*), item:_int, state:_int],
         Text   = _(Ihandle*)
     >
 >
@@ -15,13 +16,28 @@ type Event = <
 var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
     if not arg.e\?Iup        { return _0 }
     if not arg.e\!Iup?Button { return _0 }
-    return leq [arg.e\!Iup!Button::_long,arg.but::_long]
+    return or [
+            leq [_0:_long,arg.but::_long],
+            leq [arg.e\!Iup!Button::_long,arg.but::_long]
+           ]
+}
+
+var isEventList = func [e:/Event, lst:_(Ihandle*)] -> _int {
+    if not arg.e\?Iup      { return _0 }
+    if not arg.e\!Iup?List { return _0 }
+    return or [
+            leq [_0:_long,arg.lst::_long],
+            leq [arg.e\!Iup!List.1::_long,arg.lst::_long]
+           ]
 }
 
 var isEventText = func [e:/Event, txt:_(Ihandle*)] -> _int {
     if not arg.e\?Iup      { return _0 }
     if not arg.e\!Iup?Text { return _0 }
-    return (leq [arg.e\!Iup!Text::_long,arg.txt::_long]) :: _int
+    return or [
+            leq [_0:_long,arg.txt::_long],
+            leq [arg.e\!Iup!Text::_long,arg.txt::_long]
+           ]
 }
 
 type OIup = <
@@ -35,6 +51,7 @@ type OIup = <
     Append   = [_(Ihandle*), _(Ihandle*)],
     GetFloat = [_(Ihandle*), _(char*), /_float],
     GetInt   = [_(Ihandle*), _(char*), /_int],
+    GetStr   = [_(Ihandle*), _(char*), /_(char*)],
     SetFloat = [_(Ihandle*), _(char*), _float],
     SetInt   = [_(Ihandle*), _(char*), _int],
     SetStr   = [_(Ihandle*), _(char*), _(char*)],
@@ -43,6 +60,7 @@ type OIup = <
     Button   = [/_(Ihandle*), _(char*)],
     Dialog   = [/_(Ihandle*), _(Ihandle*)],
     HBox     = /_(Ihandle*),
+    VBox     = /_(Ihandle*),
     Label    = [/_(Ihandle*), _(char*)],
     List     = /_(Ihandle*),
     Text     = /_(Ihandle*)
@@ -52,6 +70,12 @@ native type _{
     int iup_cb_button (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
         Event evt = { EVENT_IUP, .Iup={EVENT_IUP_BUTTON, {.Button=self}} };
+        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        return IUP_DEFAULT;
+    }
+    int iup_cb_list (Ihandle* self, char *text, int item, int state) {
+        Stack stk = { NULL, NULL, GLOBAL };
+        Event evt = { EVENT_IUP, .Iup={EVENT_IUP_LIST, {.List={self,text,item,state}}} };
         bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
         return IUP_DEFAULT;
     }
@@ -89,6 +113,9 @@ native type _{
             case OIUP_GETINT:
                 *arg.GetInt._3 = IupGetInt(arg.GetInt._1, arg.GetInt._2);
                 break;
+            case OIUP_GETSTR:
+                *arg.GetStr._3 = IupGetAttribute(arg.GetStr._1, arg.GetStr._2);
+                break;
             case OIUP_SETFLOAT:
                 IupSetFloat(arg.SetFloat._1, arg.SetFloat._2, arg.SetFloat._3);
                 break;
@@ -112,12 +139,15 @@ native type _{
             case OIUP_HBOX:
                 *arg.HBox = IupHbox(NULL);
                 break;
+            case OIUP_VBOX:
+                *arg.VBox = IupVbox(NULL);
+                break;
             case OIUP_LABEL:
                 *arg.Label._1 = IupLabel(arg.Label._2);
                 break;
             case OIUP_LIST:
                 *arg.List = IupList(NULL);
-                //IupSetCallback(*arg.List, "VALUECHANGED_CB", (Icallback) iup_cb_text);
+                IupSetCallback(*arg.List, "ACTION", (Icallback) iup_cb_list);
                 break;
             case OIUP_TEXT:
                 *arg.Text = IupText(NULL);
