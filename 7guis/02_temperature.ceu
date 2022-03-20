@@ -35,67 +35,68 @@ int main(int argc, char **argv)
 #endif
 }
 
+^"event.ceu"
 ^"int.ceu"
 ^"long.ceu"
 ^"iup.ceu"
 
-output iup OIup.Open
+output iup Iup.Open
 
 spawn {
     var labelC: _(Ihandle*)
     var labelF: _(Ihandle*)
     {
-        output iup OIup.Label [/labelC, _("Celsius =")]
-        output iup OIup.Label [/labelF, _("Fahrenheit")]
+        output iup Iup.Label [/labelC, _("Celsius =")]
+        output iup Iup.Label [/labelF, _("Fahrenheit")]
     }
 
     var tempC: _(Ihandle*) {
-        output iup OIup.Text   /tempC
-        output iup OIup.SetStr [tempC, _("SIZE"), _("50")]
-        output iup OIup.SetStr [tempC, _("MASK"), _IUP_MASK_FLOAT]
-        output iup OIup.SetStr [tempC, _("VALUE"), _("")]
+        output iup Iup.Text   /tempC
+        output iup Iup.SetStr [tempC, _("SIZE"), _("50")]
+        output iup Iup.SetStr [tempC, _("MASK"), _IUP_MASK_FLOAT]
+        output iup Iup.SetStr [tempC, _("VALUE"), _("")]
     }
 
     var tempF: _(Ihandle*) {
-        output iup OIup.Text   /tempF
-        output iup OIup.SetStr [tempF, _("SIZE"), _("50")]
-        output iup OIup.SetStr [tempF, _("MASK"), _IUP_MASK_FLOAT]
-        output iup OIup.SetStr [tempF, _("VALUE"), _("")]
+        output iup Iup.Text   /tempF
+        output iup Iup.SetStr [tempF, _("SIZE"), _("50")]
+        output iup Iup.SetStr [tempF, _("MASK"), _IUP_MASK_FLOAT]
+        output iup Iup.SetStr [tempF, _("VALUE"), _("")]
     }
 
     var hbox: _(Ihandle*) {
-        output iup OIup.HBox   /hbox
-        output iup OIup.Append [hbox, tempC]
-        output iup OIup.Append [hbox, labelC]
-        output iup OIup.Append [hbox, tempF]
-        output iup OIup.Append [hbox, labelF]
-        output iup OIup.SetStr [hbox, _("MARGIN"), _("10x10")]
-        output iup OIup.SetStr [hbox, _("GAP"), _("10")]
-        output iup OIup.SetStr [hbox, _("ALIGNMENT"), _("ACENTER")]
+        output iup Iup.HBox   /hbox
+        output iup Iup.Append [hbox, tempC]
+        output iup Iup.Append [hbox, labelC]
+        output iup Iup.Append [hbox, tempF]
+        output iup Iup.Append [hbox, labelF]
+        output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
+        output iup Iup.SetStr [hbox, _("GAP"), _("10")]
+        output iup Iup.SetStr [hbox, _("ALIGNMENT"), _("ACENTER")]
     }
 
     var dlg: _(Ihandle*) {
-        output iup OIup.Dialog [/dlg, hbox]
-        output iup OIup.SetStr [hbox, _("TITLE"), _("Temperature")]
+        output iup Iup.Dialog [/dlg, hbox]
+        output iup Iup.SetStr [hbox, _("TITLE"), _("Temperature")]
     }
 
-    output iup OIup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
     par {
         every isEventText [/evt,tempC] {
             var v: _float
-            output iup OIup.GetFloat [tempC, _("VALUE"), /v]
-            output iup OIup.SetStrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
+            output iup Iup.GetFloat [tempC, _("VALUE"), /v]
+            output iup Iup.SetStrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
         }
     } with {
         every isEventText [/evt,tempF] {
             var v: _float
-            output iup OIup.GetFloat [tempF, _("VALUE"), /v]
-            output iup OIup.SetStrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
+            output iup Iup.GetFloat [tempF, _("VALUE"), /v]
+            output iup Iup.SetStrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
         }
     }
 }
 
-output iup OIup.Loop
-output iup OIup.Close
+output iup Iup.Loop
+output iup Iup.Close
 

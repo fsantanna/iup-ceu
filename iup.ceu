@@ -2,14 +2,11 @@ native type _{
     #include <iup.h>
 }
 
-type Event = <
-    Kill = (),
-    Task = _uint64_t,
-    None = (),
-    Iup  = <    -- TODO: inheritance _(Ihandle*) + ...
-        Button = _(Ihandle*),
-        List   = [self:_(Ihandle*), text:_(char*), item:_int, state:_int],
-        Text   = _(Ihandle*)
+type Event += <
+    Iup = [h: _(Ihandle*)] + <
+        Button = (),
+        List   = [text:_(char*), item:_int, state:_int],
+        Text   = ()
     >
 >
 
@@ -18,7 +15,7 @@ var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
     if not arg.e\!Iup?Button { return _0 }
     return or [
             leq [_0:_long,arg.but::_long],
-            leq [arg.e\!Iup!Button::_long,arg.but::_long]
+            leq [arg.e\!Iup!Button.h::_long,arg.but::_long]
            ]
 }
 
@@ -27,7 +24,7 @@ var isEventList = func [e:/Event, lst:_(Ihandle*)] -> _int {
     if not arg.e\!Iup?List { return _0 }
     return or [
             leq [_0:_long,arg.lst::_long],
-            leq [arg.e\!Iup!List.1::_long,arg.lst::_long]
+            leq [arg.e\!Iup!List.h::_long,arg.lst::_long]
            ]
 }
 
@@ -36,7 +33,7 @@ var isEventText = func [e:/Event, txt:_(Ihandle*)] -> _int {
     if not arg.e\!Iup?Text { return _0 }
     return or [
             leq [_0:_long,arg.txt::_long],
-            leq [arg.e\!Iup!Text::_long,arg.txt::_long]
+            leq [arg.e\!Iup!Text.h::_long,arg.txt::_long]
            ]
 }
 
@@ -69,23 +66,41 @@ type Iup = <
 native type _{
     int iup_cb_button (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
-        Event evt = { CEU_EVENT_IUP, .Iup={CEU_EVENT_IUP_BUTTON, {.Button=self}} };
-        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        CEU_Event evt = {
+            .tag = CEU_EVENT_IUP,
+            .Iup = {
+                .tag = CEU_EVENT_IUP_BUTTON,
+                .Button = {self}
+            }
+        };
+        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
         return IUP_DEFAULT;
     }
     int iup_cb_list (Ihandle* self, char *text, int item, int state) {
         Stack stk = { NULL, NULL, GLOBAL };
-        Event evt = { CEU_EVENT_IUP, .Iup={CEU_EVENT_IUP_LIST, {.List={self,text,item,state}}} };
-        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        CEU_Event evt = {
+            .tag = CEU_EVENT_IUP,
+            .Iup = {
+                .tag = CEU_EVENT_IUP_LIST,
+                .List = {self,text,item,state}
+            }
+        };
+        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
         return IUP_DEFAULT;
     }
     int iup_cb_text (Ihandle* self) {
         Stack stk = { NULL, NULL, GLOBAL };
-        Event evt = { CEU_EVENT_IUP, .Iup={CEU_EVENT_IUP_TEXT, {.Text=self}} };
-        bcast_event_block(&stk, GLOBAL, (_Event*)&evt);
+        CEU_Event evt = {
+            .tag = CEU_EVENT_IUP,
+            .Iup = {
+                .tag = CEU_EVENT_IUP_TEXT,
+                .Text = {self}
+            }
+        };
+        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
         return IUP_DEFAULT;
     }
-    void output_iup (Iup arg) {
+    void output_iup (CEU_Iup arg) {
         switch (arg.tag) {
             case CEU_IUP_CLOSE:
                 IupClose();

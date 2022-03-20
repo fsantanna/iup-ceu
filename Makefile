@@ -4,3 +4,8 @@ all:
 	ceu $(SRC).ceu -cc "-g -liupimglib -liup -I include/"
 	#./out.exe
 	#./$(SRC)
+
+tst:
+	make SRC=7guis/01_counter
+
+.PHONY: tst
