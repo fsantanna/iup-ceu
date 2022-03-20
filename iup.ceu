@@ -10,7 +10,7 @@ type Event += <
     >
 >
 
-var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
+func isEventButton: [e:/Event, but:_(Ihandle*)] -> _int {
     if not arg.e\?Iup        { return _0 }
     if not arg.e\!Iup?Button { return _0 }
     return or [
@@ -19,7 +19,7 @@ var isEventButton = func [e:/Event, but:_(Ihandle*)] -> _int {
            ]
 }
 
-var isEventList = func [e:/Event, lst:_(Ihandle*)] -> _int {
+func isEventList: [e:/Event, lst:_(Ihandle*)] -> _int {
     if not arg.e\?Iup      { return _0 }
     if not arg.e\!Iup?List { return _0 }
     return or [
@@ -28,7 +28,7 @@ var isEventList = func [e:/Event, lst:_(Ihandle*)] -> _int {
            ]
 }
 
-var isEventText = func [e:/Event, txt:_(Ihandle*)] -> _int {
+func isEventText: [e:/Event, txt:_(Ihandle*)] -> _int {
     if not arg.e\?Iup      { return _0 }
     if not arg.e\!Iup?Text { return _0 }
     return or [
