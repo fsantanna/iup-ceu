@@ -46,13 +46,19 @@ type Iup = <
     ShowXY   = [_(Ihandle*), _int, _int],
 
     Append   = [_(Ihandle*), _(Ihandle*)],
-    GetFloat = [_(Ihandle*), _(char*), /_float],
-    GetInt   = [_(Ihandle*), _(char*), /_int],
-    GetStr   = [_(Ihandle*), _(char*), /_(char*)],
-    SetFloat = [_(Ihandle*), _(char*), _float],
-    SetInt   = [_(Ihandle*), _(char*), _int],
-    SetStr   = [_(Ihandle*), _(char*), _(char*)],
-    SetStrF  = [_(Ihandle*), _(char*), _(char*), _float],
+
+    Get = [h:_(Ihandle*), f:_(char*)] + <
+        Float = [v: /_float],
+        Int   = [v: /_int],
+        Str   = [v: /_(char*)]
+    >,
+
+    Set = [h:_(Ihandle*), f:_(char*)] + <
+        Float = [v:_float],
+        Int   = [v:_int],
+        Str   = [v:_(char*)],
+        StrF  = [v:_(char*), x:_float]
+    >,
 
     Button   = [/_(Ihandle*), _(char*)],
     Dialog   = [/_(Ihandle*), _(Ihandle*)],
@@ -122,27 +128,39 @@ native type _{
             case CEU_IUP_APPEND:
                 IupAppend(arg.Append._1, arg.Append._2);
                 break;
-            case CEU_IUP_GETFLOAT:
-                *arg.GetFloat._3 = IupGetFloat(arg.GetFloat._1, arg.GetFloat._2);
+
+            case CEU_IUP_GET: {
+                switch (arg.Get.tag) {
+                    case CEU_IUP_GET_FLOAT:
+                        *arg.Get.Float._3 = IupGetFloat(arg.Get.Float._1, arg.Get.Float._2);
+                        break;
+                    case CEU_IUP_GET_INT:
+                        *arg.Get.Int._3 = IupGetInt(arg.Get.Int._1, arg.Get.Int._2);
+                        break;
+                    case CEU_IUP_GET_STR:
+                        *arg.Get.Str._3 = IupGetAttribute(arg.Get.Str._1, arg.Get.Str._2);
+                        break;
+                }
                 break;
-            case CEU_IUP_GETINT:
-                *arg.GetInt._3 = IupGetInt(arg.GetInt._1, arg.GetInt._2);
+            }
+
+            case CEU_IUP_SET: {
+                switch (arg.Set.tag) {
+                    case CEU_IUP_SET_FLOAT:
+                        IupSetFloat(arg.Set.Float._1, arg.Set.Float._2, arg.Set.Float._3);
+                        break;
+                    case CEU_IUP_SET_INT:
+                        IupSetInt(arg.Set.Int._1, arg.Set.Int._2, arg.Set.Int._3);
+                        break;
+                    case CEU_IUP_SET_STR:
+                        IupSetAttribute(arg.Set.Str._1, arg.Set.Str._2, arg.Set.Str._3);
+                        break;
+                    case CEU_IUP_SET_STRF:
+                        IupSetStrf(arg.Set.StrF._1, arg.Set.StrF._2, arg.Set.StrF._3, arg.Set.StrF._4);
+                        break;
+                }
                 break;
-            case CEU_IUP_GETSTR:
-                *arg.GetStr._3 = IupGetAttribute(arg.GetStr._1, arg.GetStr._2);
-                break;
-            case CEU_IUP_SETFLOAT:
-                IupSetFloat(arg.SetFloat._1, arg.SetFloat._2, arg.SetFloat._3);
-                break;
-            case CEU_IUP_SETINT:
-                IupSetInt(arg.SetInt._1, arg.SetInt._2, arg.SetInt._3);
-                break;
-            case CEU_IUP_SETSTR:
-                IupSetAttribute(arg.SetStr._1, arg.SetStr._2, arg.SetStr._3);
-                break;
-            case CEU_IUP_SETSTRF:
-                IupSetStrf(arg.SetStrF._1, arg.SetStrF._2, arg.SetStrF._3, arg.SetStrF._4);
-                break;
+            }
 
             case CEU_IUP_BUTTON:
                 *arg.Button._1 = IupButton(arg.Button._2, NULL);

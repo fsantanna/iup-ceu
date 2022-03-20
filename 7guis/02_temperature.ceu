@@ -52,16 +52,16 @@ spawn {
 
     var tempC: _(Ihandle*) {
         output iup Iup.Text   /tempC
-        output iup Iup.SetStr [tempC, _("SIZE"), _("50")]
-        output iup Iup.SetStr [tempC, _("MASK"), _IUP_MASK_FLOAT]
-        output iup Iup.SetStr [tempC, _("VALUE"), _("")]
+        output iup Iup.Set.Str [tempC, _("SIZE"), _("50")]
+        output iup Iup.Set.Str [tempC, _("MASK"), _IUP_MASK_FLOAT]
+        output iup Iup.Set.Str [tempC, _("VALUE"), _("")]
     }
 
     var tempF: _(Ihandle*) {
         output iup Iup.Text   /tempF
-        output iup Iup.SetStr [tempF, _("SIZE"), _("50")]
-        output iup Iup.SetStr [tempF, _("MASK"), _IUP_MASK_FLOAT]
-        output iup Iup.SetStr [tempF, _("VALUE"), _("")]
+        output iup Iup.Set.Str [tempF, _("SIZE"), _("50")]
+        output iup Iup.Set.Str [tempF, _("MASK"), _IUP_MASK_FLOAT]
+        output iup Iup.Set.Str [tempF, _("VALUE"), _("")]
     }
 
     var hbox: _(Ihandle*) {
@@ -70,14 +70,14 @@ spawn {
         output iup Iup.Append [hbox, labelC]
         output iup Iup.Append [hbox, tempF]
         output iup Iup.Append [hbox, labelF]
-        output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
-        output iup Iup.SetStr [hbox, _("GAP"), _("10")]
-        output iup Iup.SetStr [hbox, _("ALIGNMENT"), _("ACENTER")]
+        output iup Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
+        output iup Iup.Set.Str [hbox, _("GAP"), _("10")]
+        output iup Iup.Set.Str [hbox, _("ALIGNMENT"), _("ACENTER")]
     }
 
     var dlg: _(Ihandle*) {
         output iup Iup.Dialog [/dlg, hbox]
-        output iup Iup.SetStr [hbox, _("TITLE"), _("Temperature")]
+        output iup Iup.Set.Str [hbox, _("TITLE"), _("Temperature")]
     }
 
     output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
@@ -85,14 +85,14 @@ spawn {
     par {
         every isEventText [/evt,tempC] {
             var v: _float
-            output iup Iup.GetFloat [tempC, _("VALUE"), /v]
-            output iup Iup.SetStrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
+            output iup Iup.Get.Float [tempC, _("VALUE"), /v]
+            output iup Iup.Set.StrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
         }
     } with {
         every isEventText [/evt,tempF] {
             var v: _float
-            output iup Iup.GetFloat [tempF, _("VALUE"), /v]
-            output iup Iup.SetStrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
+            output iup Iup.Get.Float [tempF, _("VALUE"), /v]
+            output iup Iup.Set.StrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
         }
     }
 }

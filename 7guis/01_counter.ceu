@@ -8,35 +8,35 @@ output iup Iup.Open
 spawn {
     var button: _(Ihandle*) {
         output iup Iup.Button [/button, _("Count")]
-        output iup Iup.SetStr [button,  _("SIZE"), _("60")]
+        output iup Iup.Set.Str [button,  _("SIZE"), _("60")]
     }
 
     var text: _(Ihandle*) {
         output iup Iup.Text   /text
-        output iup Iup.SetStr [text, _("SIZE"),     _("60")]
-        output iup Iup.SetStr [text, _("READONLY"), _("YES")]
-        output iup Iup.SetInt [text, _("VALUE"),    _0]
+        output iup Iup.Set.Str [text, _("SIZE"),     _("60")]
+        output iup Iup.Set.Str [text, _("READONLY"), _("YES")]
+        output iup Iup.Set.Int [text, _("VALUE"),    _0]
     }
 
     var hbox: _(Ihandle*) {
         output iup Iup.HBox   /hbox
         output iup Iup.Append [hbox, text]
         output iup Iup.Append [hbox, button]
-        output iup Iup.SetStr [hbox, _("MARGIN"), _("10x10")]
-        output iup Iup.SetStr [hbox, _("GAP"),    _("10")]
+        output iup Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
+        output iup Iup.Set.Str [hbox, _("GAP"),    _("10")]
     }
 
     var dlg: _(Ihandle*) {
         output iup Iup.Dialog [/dlg, hbox]
-        output iup Iup.SetStr [hbox, _("TITLE"), _("Counter")]
+        output iup Iup.Set.Str [hbox, _("TITLE"), _("Counter")]
     }
 
     output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
     every isEventButton [/evt,button] {
         var v: _int
-        output iup Iup.GetInt [text, _("VALUE"), /v]
-        output iup Iup.SetInt [text, _("VALUE"), add [v,_1]]
+        output iup Iup.Get.Int [text, _("VALUE"), /v]
+        output iup Iup.Set.Int [text, _("VALUE"), add [v,_1]]
     }
 }
 
