@@ -4,8 +4,8 @@ native type _{
 
 type Event += <
     Iup = [h: _(Ihandle*)] + <
-        Button = (),
-        List   = [text:_(char*), item:_int, state:_int],
+        Button = ()
+        List   = [text:_(char*), item:_int, state:_int]
         Text   = ()
     >
 >
@@ -38,34 +38,34 @@ func isEventText: [e:/Event, txt:_(Ihandle*)] -> _int {
 }
 
 type Iup = <
-    Close    = (),
-    Open     = (),
-    Loop     = (),
+    Close    = ()
+    Open     = ()
+    Loop     = ()
 
-    Message  = [_(char*), _(char*)],
-    ShowXY   = [_(Ihandle*), _int, _int],
+    Message  = [_(char*), _(char*)]
+    ShowXY   = [_(Ihandle*), _int, _int]
 
-    Append   = [_(Ihandle*), _(Ihandle*)],
+    Append   = [_(Ihandle*), _(Ihandle*)]
 
     Get = [h:_(Ihandle*), f:_(char*)] + <
-        Float = [v: /_float],
-        Int   = [v: /_int],
+        Float = [v: /_float]
+        Int   = [v: /_int]
         Str   = [v: /_(char*)]
-    >,
+    >
 
     Set = [h:_(Ihandle*), f:_(char*)] + <
-        Float = [v:_float],
-        Int   = [v:_int],
-        Str   = [v:_(char*)],
+        Float = [v:_float]
+        Int   = [v:_int]
+        Str   = [v:_(char*)]
         StrF  = [v:_(char*), x:_float]
-    >,
+    >
 
-    Button   = [/_(Ihandle*), _(char*)],
-    Dialog   = [/_(Ihandle*), _(Ihandle*)],
-    HBox     = /_(Ihandle*),
-    VBox     = /_(Ihandle*),
-    Label    = [/_(Ihandle*), _(char*)],
-    List     = /_(Ihandle*),
+    Button   = [/_(Ihandle*), _(char*)]
+    Dialog   = [/_(Ihandle*), _(Ihandle*)]
+    HBox     = /_(Ihandle*)
+    VBox     = /_(Ihandle*)
+    Label    = [/_(Ihandle*), _(char*)]
+    List     = /_(Ihandle*)
     Text     = /_(Ihandle*)
 >
 

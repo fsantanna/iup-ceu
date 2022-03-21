@@ -6,19 +6,22 @@
 output iup Iup.Open
 
 spawn {
-    var button: _(Ihandle*) {
+    var button: _(Ihandle*)
+    {
         output iup Iup.Button [/button, _("Count")]
         output iup Iup.Set.Str [button,  _("SIZE"), _("60")]
     }
 
-    var text: _(Ihandle*) {
+    var text: _(Ihandle*)
+    {
         output iup Iup.Text   /text
         output iup Iup.Set.Str [text, _("SIZE"),     _("60")]
         output iup Iup.Set.Str [text, _("READONLY"), _("YES")]
         output iup Iup.Set.Int [text, _("VALUE"),    _0]
     }
 
-    var hbox: _(Ihandle*) {
+    var hbox: _(Ihandle*)
+    {
         output iup Iup.HBox   /hbox
         output iup Iup.Append [hbox, text]
         output iup Iup.Append [hbox, button]
@@ -26,7 +29,8 @@ spawn {
         output iup Iup.Set.Str [hbox, _("GAP"),    _("10")]
     }
 
-    var dlg: _(Ihandle*) {
+    var dlg: _(Ihandle*)
+    {
         output iup Iup.Dialog [/dlg, hbox]
         output iup Iup.Set.Str [hbox, _("TITLE"), _("Counter")]
     }

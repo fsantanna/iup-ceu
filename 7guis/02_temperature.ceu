@@ -50,21 +50,24 @@ spawn {
         output iup Iup.Label [/labelF, _("Fahrenheit")]
     }
 
-    var tempC: _(Ihandle*) {
+    var tempC: _(Ihandle*)
+    {
         output iup Iup.Text   /tempC
         output iup Iup.Set.Str [tempC, _("SIZE"), _("50")]
         output iup Iup.Set.Str [tempC, _("MASK"), _IUP_MASK_FLOAT]
         output iup Iup.Set.Str [tempC, _("VALUE"), _("")]
     }
 
-    var tempF: _(Ihandle*) {
+    var tempF: _(Ihandle*)
+    {
         output iup Iup.Text   /tempF
         output iup Iup.Set.Str [tempF, _("SIZE"), _("50")]
         output iup Iup.Set.Str [tempF, _("MASK"), _IUP_MASK_FLOAT]
         output iup Iup.Set.Str [tempF, _("VALUE"), _("")]
     }
 
-    var hbox: _(Ihandle*) {
+    var hbox: _(Ihandle*)
+    {
         output iup Iup.HBox   /hbox
         output iup Iup.Append [hbox, tempC]
         output iup Iup.Append [hbox, labelC]
@@ -75,7 +78,8 @@ spawn {
         output iup Iup.Set.Str [hbox, _("ALIGNMENT"), _("ACENTER")]
     }
 
-    var dlg: _(Ihandle*) {
+    var dlg: _(Ihandle*)
+    {
         output iup Iup.Dialog [/dlg, hbox]
         output iup Iup.Set.Str [hbox, _("TITLE"), _("Temperature")]
     }
