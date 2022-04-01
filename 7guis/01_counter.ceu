@@ -1,48 +1,48 @@
-^"event.ceu"
+^"prelude.ceu"
 ^"int.ceu"
 ^"long.ceu"
 ^"iup.ceu"
 
-output iup Iup.Open
+output Iup.Open ()
 
 spawn {
     var button: _(Ihandle*)
     {
-        output iup Iup.Button [/button, _("Count")]
-        output iup Iup.Set.Str [button,  _("SIZE"), _("60")]
+        output Iup.Button [/button, _("Count")]
+        output Iup.Set.Str [button,  _("SIZE"), _("60")]
     }
 
     var text: _(Ihandle*)
     {
-        output iup Iup.Text   /text
-        output iup Iup.Set.Str [text, _("SIZE"),     _("60")]
-        output iup Iup.Set.Str [text, _("READONLY"), _("YES")]
-        output iup Iup.Set.Int [text, _("VALUE"),    _0]
+        output Iup.Text   /text
+        output Iup.Set.Str [text, _("SIZE"),     _("60")]
+        output Iup.Set.Str [text, _("READONLY"), _("YES")]
+        output Iup.Set.Int [text, _("VALUE"),    _0]
     }
 
     var hbox: _(Ihandle*)
     {
-        output iup Iup.HBox   /hbox
-        output iup Iup.Append [hbox, text]
-        output iup Iup.Append [hbox, button]
-        output iup Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
-        output iup Iup.Set.Str [hbox, _("GAP"),    _("10")]
+        output Iup.HBox   /hbox
+        output Iup.Append [hbox, text]
+        output Iup.Append [hbox, button]
+        output Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
+        output Iup.Set.Str [hbox, _("GAP"),    _("10")]
     }
 
     var dlg: _(Ihandle*)
     {
-        output iup Iup.Dialog [/dlg, hbox]
-        output iup Iup.Set.Str [hbox, _("TITLE"), _("Counter")]
+        output Iup.Dialog [/dlg, hbox]
+        output Iup.Set.Str [hbox, _("TITLE"), _("Counter")]
     }
 
-    output iup Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    output Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
 
     every isEventButton [/evt,button] {
         var v: _int
-        output iup Iup.Get.Int [text, _("VALUE"), /v]
-        output iup Iup.Set.Int [text, _("VALUE"), add [v,_1]]
+        output Iup.Get.Int [text, _("VALUE"), /v]
+        output Iup.Set.Int [text, _("VALUE"), add [v,_1]]
     }
 }
 
-output iup Iup.Loop
-output iup Iup.Close
+output Iup.Loop ()
+output Iup.Close ()

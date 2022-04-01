@@ -37,36 +37,38 @@ func isEventText: [e:/Event, txt:_(Ihandle*)] -> _int {
            ]
 }
 
-type Iup = <
-    Close    = ()
-    Open     = ()
-    Loop     = ()
+type Output += <
+    Iup = <
+        Close    = ()
+        Open     = ()
+        Loop     = ()
 
-    Message  = [_(char*), _(char*)]
-    ShowXY   = [_(Ihandle*), _int, _int]
+        Message  = [_(char*), _(char*)]
+        ShowXY   = [_(Ihandle*), _int, _int]
 
-    Append   = [_(Ihandle*), _(Ihandle*)]
+        Append   = [_(Ihandle*), _(Ihandle*)]
 
-    Get = [h:_(Ihandle*), f:_(char*)] + <
-        Float = [v: /_float]
-        Int   = [v: /_int]
-        Str   = [v: /_(char*)]
+        Get = [h:_(Ihandle*), f:_(char*)] + <
+            Float = [v: /_float]
+            Int   = [v: /_int]
+            Str   = [v: /_(char*)]
+        >
+
+        Set = [h:_(Ihandle*), f:_(char*)] + <
+            Float = [v:_float]
+            Int   = [v:_int]
+            Str   = [v:_(char*)]
+            StrF  = [v:_(char*), x:_float]
+        >
+
+        Button   = [/_(Ihandle*), _(char*)]
+        Dialog   = [/_(Ihandle*), _(Ihandle*)]
+        HBox     = /_(Ihandle*)
+        VBox     = /_(Ihandle*)
+        Label    = [/_(Ihandle*), _(char*)]
+        List     = /_(Ihandle*)
+        Text     = /_(Ihandle*)
     >
-
-    Set = [h:_(Ihandle*), f:_(char*)] + <
-        Float = [v:_float]
-        Int   = [v:_int]
-        Str   = [v:_(char*)]
-        StrF  = [v:_(char*), x:_float]
-    >
-
-    Button   = [/_(Ihandle*), _(char*)]
-    Dialog   = [/_(Ihandle*), _(Ihandle*)]
-    HBox     = /_(Ihandle*)
-    VBox     = /_(Ihandle*)
-    Label    = [/_(Ihandle*), _(char*)]
-    List     = /_(Ihandle*)
-    Text     = /_(Ihandle*)
 >
 
 native type _{
@@ -106,85 +108,86 @@ native type _{
         bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
         return IUP_DEFAULT;
     }
-    void output_iup (CEU_Iup arg) {
-        switch (arg.tag) {
-            case CEU_IUP_CLOSE:
+    void output_Iup (CEU_Output arg) {
+        assert(arg.tag == CEU_OUTPUT_IUP);
+        switch (arg.Iup.tag) {
+            case CEU_OUTPUT_IUP_CLOSE:
                 IupClose();
                 break;
-            case CEU_IUP_OPEN:
+            case CEU_OUTPUT_IUP_OPEN:
                 IupOpen(NULL, NULL);
                 break;
-            case CEU_IUP_LOOP:
+            case CEU_OUTPUT_IUP_LOOP:
                 IupMainLoop();
                 break;
 
-            case CEU_IUP_MESSAGE:
-                IupMessage(arg.Message._1, arg.Message._2);
+            case CEU_OUTPUT_IUP_MESSAGE:
+                IupMessage(arg.Iup.Message._1, arg.Iup.Message._2);
                 break;
-            case CEU_IUP_SHOWXY:
-                IupShowXY(arg.ShowXY._1, arg.ShowXY._2, arg.ShowXY._3);
-                break;
-
-            case CEU_IUP_APPEND:
-                IupAppend(arg.Append._1, arg.Append._2);
+            case CEU_OUTPUT_IUP_SHOWXY:
+                IupShowXY(arg.Iup.ShowXY._1, arg.Iup.ShowXY._2, arg.Iup.ShowXY._3);
                 break;
 
-            case CEU_IUP_GET: {
-                switch (arg.Get.tag) {
-                    case CEU_IUP_GET_FLOAT:
-                        *arg.Get.Float._3 = IupGetFloat(arg.Get.Float._1, arg.Get.Float._2);
+            case CEU_OUTPUT_IUP_APPEND:
+                IupAppend(arg.Iup.Append._1, arg.Iup.Append._2);
+                break;
+
+            case CEU_OUTPUT_IUP_GET: {
+                switch (arg.Iup.Get.tag) {
+                    case CEU_OUTPUT_IUP_GET_FLOAT:
+                        *arg.Iup.Get.Float._3 = IupGetFloat(arg.Iup.Get.Float._1, arg.Iup.Get.Float._2);
                         break;
-                    case CEU_IUP_GET_INT:
-                        *arg.Get.Int._3 = IupGetInt(arg.Get.Int._1, arg.Get.Int._2);
+                    case CEU_OUTPUT_IUP_GET_INT:
+                        *arg.Iup.Get.Int._3 = IupGetInt(arg.Iup.Get.Int._1, arg.Iup.Get.Int._2);
                         break;
-                    case CEU_IUP_GET_STR:
-                        *arg.Get.Str._3 = IupGetAttribute(arg.Get.Str._1, arg.Get.Str._2);
+                    case CEU_OUTPUT_IUP_GET_STR:
+                        *arg.Iup.Get.Str._3 = IupGetAttribute(arg.Iup.Get.Str._1, arg.Iup.Get.Str._2);
                         break;
                 }
                 break;
             }
 
-            case CEU_IUP_SET: {
-                switch (arg.Set.tag) {
-                    case CEU_IUP_SET_FLOAT:
-                        IupSetFloat(arg.Set.Float._1, arg.Set.Float._2, arg.Set.Float._3);
+            case CEU_OUTPUT_IUP_SET: {
+                switch (arg.Iup.Set.tag) {
+                    case CEU_OUTPUT_IUP_SET_FLOAT:
+                        IupSetFloat(arg.Iup.Set.Float._1, arg.Iup.Set.Float._2, arg.Iup.Set.Float._3);
                         break;
-                    case CEU_IUP_SET_INT:
-                        IupSetInt(arg.Set.Int._1, arg.Set.Int._2, arg.Set.Int._3);
+                    case CEU_OUTPUT_IUP_SET_INT:
+                        IupSetInt(arg.Iup.Set.Int._1, arg.Iup.Set.Int._2, arg.Iup.Set.Int._3);
                         break;
-                    case CEU_IUP_SET_STR:
-                        IupSetAttribute(arg.Set.Str._1, arg.Set.Str._2, arg.Set.Str._3);
+                    case CEU_OUTPUT_IUP_SET_STR:
+                        IupSetAttribute(arg.Iup.Set.Str._1, arg.Iup.Set.Str._2, arg.Iup.Set.Str._3);
                         break;
-                    case CEU_IUP_SET_STRF:
-                        IupSetStrf(arg.Set.StrF._1, arg.Set.StrF._2, arg.Set.StrF._3, arg.Set.StrF._4);
+                    case CEU_OUTPUT_IUP_SET_STRF:
+                        IupSetStrf(arg.Iup.Set.StrF._1, arg.Iup.Set.StrF._2, arg.Iup.Set.StrF._3, arg.Iup.Set.StrF._4);
                         break;
                 }
                 break;
             }
 
-            case CEU_IUP_BUTTON:
-                *arg.Button._1 = IupButton(arg.Button._2, NULL);
-                IupSetCallback(*arg.Button._1, "ACTION", (Icallback) iup_cb_button);
+            case CEU_OUTPUT_IUP_BUTTON:
+                *arg.Iup.Button._1 = IupButton(arg.Iup.Button._2, NULL);
+                IupSetCallback(*arg.Iup.Button._1, "ACTION", (Icallback) iup_cb_button);
                 break;
-            case CEU_IUP_DIALOG:
-                *arg.Dialog._1 = IupDialog(arg.Dialog._2);
+            case CEU_OUTPUT_IUP_DIALOG:
+                *arg.Iup.Dialog._1 = IupDialog(arg.Iup.Dialog._2);
                 break;
-            case CEU_IUP_HBOX:
-                *arg.HBox = IupHbox(NULL);
+            case CEU_OUTPUT_IUP_HBOX:
+                *arg.Iup.HBox = IupHbox(NULL);
                 break;
-            case CEU_IUP_VBOX:
-                *arg.VBox = IupVbox(NULL);
+            case CEU_OUTPUT_IUP_VBOX:
+                *arg.Iup.VBox = IupVbox(NULL);
                 break;
-            case CEU_IUP_LABEL:
-                *arg.Label._1 = IupLabel(arg.Label._2);
+            case CEU_OUTPUT_IUP_LABEL:
+                *arg.Iup.Label._1 = IupLabel(arg.Iup.Label._2);
                 break;
-            case CEU_IUP_LIST:
-                *arg.List = IupList(NULL);
-                IupSetCallback(*arg.List, "ACTION", (Icallback) iup_cb_list);
+            case CEU_OUTPUT_IUP_LIST:
+                *arg.Iup.List = IupList(NULL);
+                IupSetCallback(*arg.Iup.List, "ACTION", (Icallback) iup_cb_list);
                 break;
-            case CEU_IUP_TEXT:
-                *arg.Text = IupText(NULL);
-                IupSetCallback(*arg.Text, "VALUECHANGED_CB", (Icallback) iup_cb_text);
+            case CEU_OUTPUT_IUP_TEXT:
+                *arg.Iup.Text = IupText(NULL);
+                IupSetCallback(*arg.Iup.Text, "VALUECHANGED_CB", (Icallback) iup_cb_text);
                 break;
 
             default:
