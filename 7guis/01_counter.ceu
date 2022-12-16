@@ -18,7 +18,7 @@ spawn {
         iup_set_str(hbox, `:pointer "GAP"`, `:pointer "10"`)
 
     var dlg = iup_dialog(hbox)
-        iup_set_str(hbox, `:pointer "TITLE"`, `:pointer "Counter"`)
+        iup_set_str(dlg, `:pointer "TITLE"`, `:pointer "Counter"`)
 
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 

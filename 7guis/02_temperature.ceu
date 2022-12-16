@@ -1,105 +1,51 @@
-native _{
-#if 0
-int txt_celcius_cb(Ihandle *self)
-{
-  Ihandle* fahrenheit = IupGetDialogChild(self, "FAHRENHEIT");
-  double value = IupGetDouble(self, "VALUE");;
+^["iup.ceu"]
 
-  value = value * (9./5.) + 32;
-
-  IupSetStrf(fahrenheit, "VALUE", "%.2lf", value);
-
-  return IUP_DEFAULT;
-}
-
-int txt_fahrenheit_cb(Ihandle *self)
-{
-  Ihandle* celcius = IupGetDialogChild(self, "CELCIUS");
-  double value = IupGetDouble(self, "VALUE");;
-
-  value = (value - 32) * (5./9.);
-
-  IupSetStrf(celcius, "VALUE", "%.2lf", value);
-
-  return IUP_DEFAULT;
-}
-
-int main(int argc, char **argv)
-{
-
-  /* Registers callbacks */
-  IupSetCallback(tempC, "VALUECHANGED_CB", (Icallback)txt_celcius_cb);
-  IupSetCallback(tempF, "VALUECHANGED_CB", (Icallback)txt_fahrenheit_cb);
-
-}
-#endif
-}
-
-^"prelude.ceu"
-^"int.ceu"
-^"long.ceu"
-^"iup.ceu"
-
-output Iup.Open
+iup_open()
 
 spawn {
-    var labelC: _(Ihandle*)
-    var labelF: _(Ihandle*)
-    {
-        output Iup.Label [/labelC, _("Celsius =")]
-        output Iup.Label [/labelF, _("Fahrenheit")]
-    }
+    var labelC = iup_label(`:pointer "Celsius ="`)
+    var labelF = iup_label(`:pointer "Fahrenheit"`)
 
-    var tempC: _(Ihandle*)
-    {
-        output Iup.Text   /tempC
-        output Iup.Set.Str [tempC, _("SIZE"), _("50")]
-        output Iup.Set.Str [tempC, _("MASK"), _IUP_MASK_FLOAT]
-        output Iup.Set.Str [tempC, _("VALUE"), _("")]
-    }
+    var tempC = iup_text()
+        iup_set_str(tempC, `:pointer "SIZE"`, `:pointer "50"`)
+        iup_set_str(tempC, `:pointer "MASK"`, `:pointer IUP_MASK_FLOAT`)
+        iup_set_str(tempC, `:pointer "VALUE"`, `:pointer ""`)
 
-    var tempF: _(Ihandle*)
-    {
-        output Iup.Text   /tempF
-        output Iup.Set.Str [tempF, _("SIZE"), _("50")]
-        output Iup.Set.Str [tempF, _("MASK"), _IUP_MASK_FLOAT]
-        output Iup.Set.Str [tempF, _("VALUE"), _("")]
-    }
+    var tempF = iup_text()
+        iup_set_str(tempC, `:pointer "SIZE"`, `:pointer "50"`)
+        iup_set_str(tempC, `:pointer "MASK"`, `:pointer IUP_MASK_FLOAT`)
+        iup_set_str(tempC, `:pointer "VALUE"`, `:pointer ""`)
 
-    var hbox: _(Ihandle*)
-    {
-        output Iup.HBox   /hbox
-        output Iup.Append [hbox, tempC]
-        output Iup.Append [hbox, labelC]
-        output Iup.Append [hbox, tempF]
-        output Iup.Append [hbox, labelF]
-        output Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
-        output Iup.Set.Str [hbox, _("GAP"), _("10")]
-        output Iup.Set.Str [hbox, _("ALIGNMENT"), _("ACENTER")]
-    }
+    var hbox = iup_hbox()
+        iup_append(hbox, tempC)
+        iup_append(hbox, labelC)
+        iup_append(hbox, tempF)
+        iup_append(hbox, labelF)
+        iup_set_str(hbox, `:pointer "MARGIN"`, `:pointer "10x10"`)
+        iup_set_str(hbox, `:pointer "GAP"`, `:pointer "10"`)
+        iup_set_str(hbox, `:pointer "ALIGNMENT"`, `:pointer "ACENTER"`)
 
-    var dlg: _(Ihandle*)
-    {
-        output Iup.Dialog [/dlg, hbox]
-        output Iup.Set.Str [hbox, _("TITLE"), _("Temperature")]
-    }
+    var dlg = iup_dialog(hbox)
+        iup_set_str(dlg, `:pointer "TITLE"`, `:pointer "Temperature"`)
 
-    output Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     par {
-        every isEventText [/evt,tempC] {
-            var v: _float
-            output Iup.Get.Float [tempC, _("VALUE"), /v]
-            output Iup.Set.StrF  [tempF, _("VALUE"), _("%.2lf"), _($v * (9./5.) + 32)]
+        every evt == tempC {
+            var c = iup_get_float(tempC, `:pointer "VALUE"`)
+            var f = c*9.0/5.0 + 32
+            `char str[16]; sprintf(str, "%.2lf", $f.Number);`
+            iup_set_str(tempF, `:pointer "VALUE"`, `:pointer str`)
         }
     } with {
-        every isEventText [/evt,tempF] {
-            var v: _float
-            output Iup.Get.Float [tempF, _("VALUE"), /v]
-            output Iup.Set.StrF  [tempC, _("VALUE"), _("%.2lf"), _(($v - 32) * (5./9.))]
+        every evt == tempF {
+            var f = iup_get_float(tempF, `:pointer "VALUE"`)
+            var c = (f-32) * 5.0/9.0
+            `char str[16]; sprintf(str, "%.2lf", $c.Number);`
+            iup_set_str(tempC, `:pointer "VALUE"`, `:pointer str`)
         }
     }
 }
 
-output Iup.Loop
-output Iup.Close
+iup_loop()
+iup_close()

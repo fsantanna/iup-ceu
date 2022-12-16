@@ -12,7 +12,9 @@ int c_iup_button_cb (Ihandle* h) {
 int c_iup_text_cb (Ihandle* h) {
     CEU_Value text = { CEU_VALUE_POINTER, {.Pointer=h} };
     CEU_Value* args[1] = { &text };
-    ceu_mem->iup_text_cb.Dyn->Proto.f(ceu_frame, 1, args);
+    CEU_Block block = { 1, NULL, { NULL, NULL } };
+    CEU_Frame frame = { &ceu_mem->iup_button_cb.Dyn->Proto, &block, NULL, {} };
+    ceu_mem->iup_text_cb.Dyn->Proto.f(&frame, 1, args);
     return IUP_DEFAULT;
 }
 ```
@@ -33,22 +35,33 @@ func iup_loop () {
 
 ;; GET / SET
 
+func iup_get_float (h, name) {
+    `:number IupGetInt($h.Pointer, $name.Pointer)`
+}
+
 func iup_get_int (h, name) {
     `:number IupGetInt($h.Pointer, $name.Pointer)`
 }
 
-func iup_set_str(h, name, value) {
-    `IupSetAttribute($h.Pointer, $name.Pointer, $value.Pointer);`
+func iup_set_float(h, name, value) {
+    `IupSetFloat($h.Pointer, $name.Pointer, $value.Number);`
 }
 
 func iup_set_int(h, name, value) {
     `IupSetInt($h.Pointer, $name.Pointer, $value.Number);`
 }
 
+func iup_set_str(h, name, value) {
+    `IupSetAttribute($h.Pointer, $name.Pointer, $value.Pointer);`
+}
+
 ;; CONTROLS
 
 func iup_button_cb (button) {
     broadcast in :global, button
+}
+func iup_text_cb (text) {
+    broadcast in :global, text
 }
 
 func iup_button (label) {
@@ -57,8 +70,8 @@ func iup_button (label) {
     ptr
 }
 
-func iup_text_cb (text) {
-    broadcast in :global, text
+func iup_label (label) {
+    `:pointer IupLabel($label.Pointer)`
 }
 
 func iup_text () {
