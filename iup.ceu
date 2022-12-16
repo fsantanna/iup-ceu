@@ -1,197 +1,88 @@
-native type _{
-    #include <iup.h>
+```:pre
+#include <iup.h>
+
+int c_iup_button_cb (Ihandle* h) {
+    CEU_Value button = { CEU_VALUE_POINTER, {.Pointer=h} };
+    CEU_Value* args[1] = { &button };
+    CEU_Block block = { 1, NULL, { NULL, NULL } };
+    CEU_Frame frame = { &ceu_mem->iup_button_cb.Dyn->Proto, &block, NULL, {} };
+    ceu_mem->iup_button_cb.Dyn->Proto.f(&frame, 1, args);
+    return IUP_DEFAULT;
+}
+int c_iup_text_cb (Ihandle* h) {
+    CEU_Value text = { CEU_VALUE_POINTER, {.Pointer=h} };
+    CEU_Value* args[1] = { &text };
+    ceu_mem->iup_text_cb.Dyn->Proto.f(ceu_frame, 1, args);
+    return IUP_DEFAULT;
+}
+```
+
+;; INIT
+
+func iup_open () {
+    `IupOpen(NULL, NULL);`
 }
 
-type Event += <
-    Iup = [h: _(Ihandle*)] + <
-        Button = ()
-        List   = [text:_(char*), item:_int, state:_int]
-        Text   = ()
-    >
->
-
-func isEventButton: [e:/Event, but:_(Ihandle*)] -> _int {
-    if not arg.e\?Iup        { return _0 }
-    if not arg.e\!Iup?Button { return _0 }
-    return or [
-            leq [_0:_long,arg.but::_long],
-            leq [arg.e\!Iup!Button.h::_long,arg.but::_long]
-           ]
+func iup_close () {
+    `IupClose();`
 }
 
-func isEventList: [e:/Event, lst:_(Ihandle*)] -> _int {
-    if not arg.e\?Iup      { return _0 }
-    if not arg.e\!Iup?List { return _0 }
-    return or [
-            leq [_0:_long,arg.lst::_long],
-            leq [arg.e\!Iup!List.h::_long,arg.lst::_long]
-           ]
+func iup_loop () {
+    `IupMainLoop();`
 }
 
-func isEventText: [e:/Event, txt:_(Ihandle*)] -> _int {
-    if not arg.e\?Iup      { return _0 }
-    if not arg.e\!Iup?Text { return _0 }
-    return or [
-            leq [_0:_long,arg.txt::_long],
-            leq [arg.e\!Iup!Text.h::_long,arg.txt::_long]
-           ]
+;; GET / SET
+
+func iup_get_int (h, name) {
+    `:number IupGetInt($h.Pointer, $name.Pointer)`
 }
 
-type Output += <
-    Iup = <
-        Close    = ()
-        Open     = ()
-        Loop     = ()
+func iup_set_str(h, name, value) {
+    `IupSetAttribute($h.Pointer, $name.Pointer, $value.Pointer);`
+}
 
-        Message  = [_(char*), _(char*)]
-        ShowXY   = [_(Ihandle*), _int, _int]
+func iup_set_int(h, name, value) {
+    `IupSetInt($h.Pointer, $name.Pointer, $value.Number);`
+}
 
-        Append   = [_(Ihandle*), _(Ihandle*)]
+;; CONTROLS
 
-        Get = [h:_(Ihandle*), f:_(char*)] + <
-            Float = [v: /_float]
-            Int   = [v: /_int]
-            Str   = [v: /_(char*)]
-        >
+func iup_button_cb (button) {
+    broadcast in :global, button
+}
 
-        Set = [h:_(Ihandle*), f:_(char*)] + <
-            Float = [v:_float]
-            Int   = [v:_int]
-            Str   = [v:_(char*)]
-            StrF  = [v:_(char*), x:_float]
-        >
+func iup_button (label) {
+    var ptr = `:pointer IupButton($label.Pointer, NULL)`
+    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_button_cb);`
+    ptr
+}
 
-        Button   = [/_(Ihandle*), _(char*)]
-        Dialog   = [/_(Ihandle*), _(Ihandle*)]
-        HBox     = /_(Ihandle*)
-        VBox     = /_(Ihandle*)
-        Label    = [/_(Ihandle*), _(char*)]
-        List     = /_(Ihandle*)
-        Text     = /_(Ihandle*)
-    >
->
+func iup_text_cb (text) {
+    broadcast in :global, text
+}
 
-native type _{
-    int iup_cb_button (Ihandle* self) {
-        Stack stk = { NULL, NULL, GLOBAL };
-        CEU_Event evt = {
-            .tag = CEU_EVENT_IUP,
-            .Iup = {
-                .tag = CEU_EVENT_IUP_BUTTON,
-                .Button = {self}
-            }
-        };
-        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
-        return IUP_DEFAULT;
-    }
-    int iup_cb_list (Ihandle* self, char *text, int item, int state) {
-        Stack stk = { NULL, NULL, GLOBAL };
-        CEU_Event evt = {
-            .tag = CEU_EVENT_IUP,
-            .Iup = {
-                .tag = CEU_EVENT_IUP_LIST,
-                .List = {self,text,item,state}
-            }
-        };
-        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
-        return IUP_DEFAULT;
-    }
-    int iup_cb_text (Ihandle* self) {
-        Stack stk = { NULL, NULL, GLOBAL };
-        CEU_Event evt = {
-            .tag = CEU_EVENT_IUP,
-            .Iup = {
-                .tag = CEU_EVENT_IUP_TEXT,
-                .Text = {self}
-            }
-        };
-        bcast_event_block(&stk, GLOBAL, (_CEU_Event*)&evt);
-        return IUP_DEFAULT;
-    }
-    void output_Iup (CEU_Output arg) {
-        assert(arg.tag == CEU_OUTPUT_IUP);
-        switch (arg.Iup.tag) {
-            case CEU_OUTPUT_IUP_CLOSE:
-                IupClose();
-                break;
-            case CEU_OUTPUT_IUP_OPEN:
-                IupOpen(NULL, NULL);
-                break;
-            case CEU_OUTPUT_IUP_LOOP:
-                IupMainLoop();
-                break;
+func iup_text () {
+    var ptr = `:pointer IupText(NULL)`
+    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", (Icallback) c_iup_text_cb);`
+    ptr
+}
 
-            case CEU_OUTPUT_IUP_MESSAGE:
-                IupMessage(arg.Iup.Message._1, arg.Iup.Message._2);
-                break;
-            case CEU_OUTPUT_IUP_SHOWXY:
-                IupShowXY(arg.Iup.ShowXY._1, arg.Iup.ShowXY._2, arg.Iup.ShowXY._3);
-                break;
+;; CONTAINERS
 
-            case CEU_OUTPUT_IUP_APPEND:
-                IupAppend(arg.Iup.Append._1, arg.Iup.Append._2);
-                break;
+func iup_hbox () {
+    var ptr = `:pointer IupHbox(NULL)`
+}
 
-            case CEU_OUTPUT_IUP_GET: {
-                switch (arg.Iup.Get.tag) {
-                    case CEU_OUTPUT_IUP_GET_FLOAT:
-                        *arg.Iup.Get.Float._3 = IupGetFloat(arg.Iup.Get.Float._1, arg.Iup.Get.Float._2);
-                        break;
-                    case CEU_OUTPUT_IUP_GET_INT:
-                        *arg.Iup.Get.Int._3 = IupGetInt(arg.Iup.Get.Int._1, arg.Iup.Get.Int._2);
-                        break;
-                    case CEU_OUTPUT_IUP_GET_STR:
-                        *arg.Iup.Get.Str._3 = IupGetAttribute(arg.Iup.Get.Str._1, arg.Iup.Get.Str._2);
-                        break;
-                }
-                break;
-            }
+func iup_append (h, child) {
+    `:pointer IupAppend($h.Pointer, $child.Pointer)`
+}
 
-            case CEU_OUTPUT_IUP_SET: {
-                switch (arg.Iup.Set.tag) {
-                    case CEU_OUTPUT_IUP_SET_FLOAT:
-                        IupSetFloat(arg.Iup.Set.Float._1, arg.Iup.Set.Float._2, arg.Iup.Set.Float._3);
-                        break;
-                    case CEU_OUTPUT_IUP_SET_INT:
-                        IupSetInt(arg.Iup.Set.Int._1, arg.Iup.Set.Int._2, arg.Iup.Set.Int._3);
-                        break;
-                    case CEU_OUTPUT_IUP_SET_STR:
-                        IupSetAttribute(arg.Iup.Set.Str._1, arg.Iup.Set.Str._2, arg.Iup.Set.Str._3);
-                        break;
-                    case CEU_OUTPUT_IUP_SET_STRF:
-                        IupSetStrf(arg.Iup.Set.StrF._1, arg.Iup.Set.StrF._2, arg.Iup.Set.StrF._3, arg.Iup.Set.StrF._4);
-                        break;
-                }
-                break;
-            }
+;; DIALOGS
 
-            case CEU_OUTPUT_IUP_BUTTON:
-                *arg.Iup.Button._1 = IupButton(arg.Iup.Button._2, NULL);
-                IupSetCallback(*arg.Iup.Button._1, "ACTION", (Icallback) iup_cb_button);
-                break;
-            case CEU_OUTPUT_IUP_DIALOG:
-                *arg.Iup.Dialog._1 = IupDialog(arg.Iup.Dialog._2);
-                break;
-            case CEU_OUTPUT_IUP_HBOX:
-                *arg.Iup.HBox = IupHbox(NULL);
-                break;
-            case CEU_OUTPUT_IUP_VBOX:
-                *arg.Iup.VBox = IupVbox(NULL);
-                break;
-            case CEU_OUTPUT_IUP_LABEL:
-                *arg.Iup.Label._1 = IupLabel(arg.Iup.Label._2);
-                break;
-            case CEU_OUTPUT_IUP_LIST:
-                *arg.Iup.List = IupList(NULL);
-                IupSetCallback(*arg.Iup.List, "ACTION", (Icallback) iup_cb_list);
-                break;
-            case CEU_OUTPUT_IUP_TEXT:
-                *arg.Iup.Text = IupText(NULL);
-                IupSetCallback(*arg.Iup.Text, "VALUECHANGED_CB", (Icallback) iup_cb_text);
-                break;
+func iup_dialog (h) {
+    `:pointer IupDialog($h.Pointer)`
+}
 
-            default:
-                assert(0 && "missing IUP operation");
-        }
-    }
+func iup_show_xy (h, x, y) {
+    `:number IupShowXY($h.Pointer, $x.Number, $y.Number)`
 }

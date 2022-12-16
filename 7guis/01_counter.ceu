@@ -1,48 +1,32 @@
-^"prelude.ceu"
-^"int.ceu"
-^"long.ceu"
-^"iup.ceu"
+^["iup.ceu"]
 
-output Iup.Open ()
+iup_open()
 
 spawn {
-    var button: _(Ihandle*)
-    {
-        output Iup.Button [/button, _("Count")]
-        output Iup.Set.Str [button,  _("SIZE"), _("60")]
-    }
+    var button = iup_button(`:pointer "Count"`)
+        iup_set_str(button, `:pointer "SIZE"`, `:pointer "60"`)
 
-    var text: _(Ihandle*)
-    {
-        output Iup.Text   /text
-        output Iup.Set.Str [text, _("SIZE"),     _("60")]
-        output Iup.Set.Str [text, _("READONLY"), _("YES")]
-        output Iup.Set.Int [text, _("VALUE"),    _0]
-    }
+    var text = iup_text()
+        iup_set_str(text, `:pointer "SIZE"`,     `:pointer "60"`)
+        iup_set_str(text, `:pointer "READONLY"`, `:pointer "YES"`)
+        iup_set_int(text, `:pointer "VALUE"`,    0)
 
-    var hbox: _(Ihandle*)
-    {
-        output Iup.HBox   /hbox
-        output Iup.Append [hbox, text]
-        output Iup.Append [hbox, button]
-        output Iup.Set.Str [hbox, _("MARGIN"), _("10x10")]
-        output Iup.Set.Str [hbox, _("GAP"),    _("10")]
-    }
+    var hbox = iup_hbox()
+        iup_append(hbox, text)
+        iup_append(hbox, button)
+        iup_set_str(hbox, `:pointer "MARGIN"`, `:pointer "10x10"`)
+        iup_set_str(hbox, `:pointer "GAP"`, `:pointer "10"`)
 
-    var dlg: _(Ihandle*)
-    {
-        output Iup.Dialog [/dlg, hbox]
-        output Iup.Set.Str [hbox, _("TITLE"), _("Counter")]
-    }
+    var dlg = iup_dialog(hbox)
+        iup_set_str(hbox, `:pointer "TITLE"`, `:pointer "Counter"`)
 
-    output Iup.ShowXY [dlg, _IUP_CENTER, _IUP_CENTER]
+    iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
-    every isEventButton [/evt,button] {
-        var v: _int
-        output Iup.Get.Int [text, _("VALUE"), /v]
-        output Iup.Set.Int [text, _("VALUE"), add [v,_1]]
+    every evt == button {
+        var v = iup_get_int(text, `:pointer "VALUE"`)
+        iup_set_int(text, `:pointer "VALUE"`, v+1)
     }
 }
 
-output Iup.Loop ()
-output Iup.Close ()
+iup_loop()
+iup_close()

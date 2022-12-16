@@ -1,0 +1,5 @@
+- https://xstate.js.org/docs/tutorials/7guis/counter.html#coding
+- https://eugenkiss.github.io/7guis/
+- https://github.com/mfelleisen/7GUI
+- https://www.tecgraf.puc-rio.br/iup/
+- https://www.tecgraf.puc-rio.br/iup/en/7gui/7gui.html
