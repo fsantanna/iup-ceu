@@ -1,20 +1,12 @@
 ```:pre
 #include <iup.h>
 
-int c_iup_button_cb (Ihandle* h) {
-    CEU_Value button = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value* args[1] = { &button };
+int c_iup_cb (Ihandle* h) {
+    CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
+    CEU_Value* args[1] = { &hh };
     CEU_Block block = { 1, NULL, { NULL, NULL } };
-    CEU_Frame frame = { &ceu_mem->iup_button_cb.Dyn->Proto, &block, NULL, {} };
-    ceu_mem->iup_button_cb.Dyn->Proto.f(&frame, 1, args);
-    return IUP_DEFAULT;
-}
-int c_iup_text_cb (Ihandle* h) {
-    CEU_Value text = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value* args[1] = { &text };
-    CEU_Block block = { 1, NULL, { NULL, NULL } };
-    CEU_Frame frame = { &ceu_mem->iup_button_cb.Dyn->Proto, &block, NULL, {} };
-    ceu_mem->iup_text_cb.Dyn->Proto.f(&frame, 1, args);
+    CEU_Frame frame = { &ceu_mem->iup_cb.Dyn->Proto, &block, NULL, {} };
+    ceu_mem->iup_cb.Dyn->Proto.f(&frame, 1, args);
     return IUP_DEFAULT;
 }
 ```
@@ -51,16 +43,13 @@ func iup_set(h, name, value) {
 
 ;; CONTROLS
 
-func iup_button_cb (button) {
-    broadcast in :global, button
-}
-func iup_text_cb (text) {
-    broadcast in :global, text
+func iup_cb (h) {
+    broadcast in :global, h
 }
 
 func iup_button (label) {
     var ptr = `:pointer IupButton($label.Dyn->Vector.mem, NULL)`
-    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_button_cb);`
+    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_cb);`
     ptr
 }
 
@@ -68,9 +57,15 @@ func iup_label (label) {
     `:pointer IupLabel($label.Dyn->Vector.mem)`
 }
 
+func iup_list () {
+    var ptr = `:pointer IupList(NULL)`
+    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_cb);`
+    ptr
+}
+
 func iup_text () {
     var ptr = `:pointer IupText(NULL)`
-    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", (Icallback) c_iup_text_cb);`
+    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", (Icallback) c_iup_cb);`
     ptr
 }
 
