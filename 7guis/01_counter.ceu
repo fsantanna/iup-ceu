@@ -3,28 +3,28 @@
 iup_open()
 
 spawn {
-    var button = iup_button(`:pointer "Count"`)
-        iup_set_str(button, `:pointer "SIZE"`, `:pointer "60"`)
+    var button = iup_button("Count")
+        iup_set(button, :SIZE, "60")
 
     var text = iup_text()
-        iup_set_str(text, `:pointer "SIZE"`,     `:pointer "60"`)
-        iup_set_str(text, `:pointer "READONLY"`, `:pointer "YES"`)
-        iup_set_int(text, `:pointer "VALUE"`,    0)
+        iup_set(text, :SIZE,     "60")
+        iup_set(text, :READONLY, "YES")
+        iup_set(text, :VALUE,    0)
 
     var hbox = iup_hbox()
         iup_append(hbox, text)
         iup_append(hbox, button)
-        iup_set_str(hbox, `:pointer "MARGIN"`, `:pointer "10x10"`)
-        iup_set_str(hbox, `:pointer "GAP"`, `:pointer "10"`)
+        iup_set(hbox, :MARGIN, "10x10")
+        iup_set(hbox, :GAP, "10")
 
     var dlg = iup_dialog(hbox)
-        iup_set_str(dlg, `:pointer "TITLE"`, `:pointer "Counter"`)
+        iup_set(dlg, :TITLE, "Counter")
 
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     every evt == button {
-        var v = iup_get_int(text, `:pointer "VALUE"`)
-        iup_set_int(text, `:pointer "VALUE"`, v+1)
+        var v = iup_get_number(text, :VALUE)
+        iup_set(text, :VALUE, v+1)
     }
 }
 

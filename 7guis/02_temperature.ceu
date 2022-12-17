@@ -3,46 +3,46 @@
 iup_open()
 
 spawn {
-    var labelC = iup_label(`:pointer "Celsius ="`)
-    var labelF = iup_label(`:pointer "Fahrenheit"`)
+    var labelC = iup_label("Celsius =")
+    var labelF = iup_label("Fahrenheit")
 
     var tempC = iup_text()
-        iup_set_str(tempC, `:pointer "SIZE"`, `:pointer "50"`)
-        iup_set_str(tempC, `:pointer "MASK"`, `:pointer IUP_MASK_FLOAT`)
-        iup_set_str(tempC, `:pointer "VALUE"`, `:pointer ""`)
+        iup_set(tempC, :SIZE, "50")
+        iup_set(tempC, :MASK, `:pointer IUP_MASK_FLOAT`)
+        iup_set(tempC, :VALUE, "")
 
     var tempF = iup_text()
-        iup_set_str(tempC, `:pointer "SIZE"`, `:pointer "50"`)
-        iup_set_str(tempC, `:pointer "MASK"`, `:pointer IUP_MASK_FLOAT`)
-        iup_set_str(tempC, `:pointer "VALUE"`, `:pointer ""`)
+        iup_set(tempC, :SIZE, "50")
+        iup_set(tempC, :MASK, `:pointer IUP_MASK_FLOAT`)
+        iup_set(tempC, :VALUE, "")
 
     var hbox = iup_hbox()
         iup_append(hbox, tempC)
         iup_append(hbox, labelC)
         iup_append(hbox, tempF)
         iup_append(hbox, labelF)
-        iup_set_str(hbox, `:pointer "MARGIN"`, `:pointer "10x10"`)
-        iup_set_str(hbox, `:pointer "GAP"`, `:pointer "10"`)
-        iup_set_str(hbox, `:pointer "ALIGNMENT"`, `:pointer "ACENTER"`)
+        iup_set(hbox, :MARGIN, "10x10")
+        iup_set(hbox, :GAP, "10")
+        iup_set(hbox, :ALIGNMENT, "ACENTER")
 
     var dlg = iup_dialog(hbox)
-        iup_set_str(dlg, `:pointer "TITLE"`, `:pointer "Temperature"`)
+        iup_set(dlg, :TITLE, "Temperature")
 
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     par {
         every evt == tempC {
-            var c = iup_get_float(tempC, `:pointer "VALUE"`)
+            var c = iup_get_number(tempC, :VALUE)
             var f = c*9.0/5.0 + 32
-            `char str[16]; sprintf(str, "%.2lf", $f.Number);`
-            iup_set_str(tempF, `:pointer "VALUE"`, `:pointer str`)
+            `static char str[16]; sprintf(str, "%.2lf", $f.Number);`
+            iup_set(tempF, :VALUE, `:pointer str`)
         }
     } with {
         every evt == tempF {
-            var f = iup_get_float(tempF, `:pointer "VALUE"`)
+            var f = iup_get_number(tempF, :VALUE)
             var c = (f-32) * 5.0/9.0
-            `char str[16]; sprintf(str, "%.2lf", $c.Number);`
-            iup_set_str(tempC, `:pointer "VALUE"`, `:pointer str`)
+            `static char str[16]; sprintf(str, "%.2lf", $c.Number);`
+            iup_set(tempC, :VALUE, `:pointer str`)
         }
     }
 }
