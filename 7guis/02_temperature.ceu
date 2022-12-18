@@ -31,14 +31,14 @@ spawn {
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     par {
-        every evt == tempC {
+        every evt_obj? (tempC) {
             var c = iup_get_number(tempC, :VALUE)
             var f = c*9.0/5.0 + 32
             `static char str[16]; sprintf(str, "%.2lf", $f.Number);`
             iup_set(tempF, :VALUE, `:pointer str`)
         }
     } with {
-        every evt == tempF {
+        every evt_obj? (tempF) {
             var f = iup_get_number(tempF, :VALUE)
             var c = (f-32) * 5.0/9.0
             `static char str[16]; sprintf(str, "%.2lf", $c.Number);`

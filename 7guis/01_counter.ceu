@@ -22,7 +22,7 @@ spawn {
 
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
-    every evt == button {
+    every evt_obj? (button) {
         var v = iup_get_number(text, :VALUE)
         iup_set(text, :VALUE, v+1)
     }
