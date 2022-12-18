@@ -45,10 +45,12 @@ func iup_loop () {
 
 ;; GET / SET
 
+func iup_get_pointer (h, name) {
+    `:pointer IupGetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
+}
 func iup_get_bool (h, name) {
     `:bool IupGetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
 }
-
 func iup_get_number (h, name) {
     `:number IupGetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
 }
