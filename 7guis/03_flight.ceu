@@ -2,7 +2,7 @@
 
 iup_open()
 
-func validate_date(day, month, year) {
+func valid_date?(day, month, year) {
     var leap? = (year%400==0) or ((year%4==0) and (year%100/=0))
     ifs {
         (day < 1) -> 0
@@ -16,8 +16,7 @@ func validate_date(day, month, year) {
 }
 
 ```:pre
-#if 0
-int parseDate (char* date, int* day, int* month, int* year) {
+int parse_date (char* date, int* day, int* month, int* year) {
     char *part, *ret;
     int count = 1;
 
@@ -65,13 +64,8 @@ int parseDate (char* date, int* day, int* month, int* year) {
         part = strtok(NULL, ".");
     }
 
-    if (count < 4) {
-        return 0;
-    }
-
-    return validateDate(*day, *month, *year);
+    return (count == 4);
 }
-#endif
 ```
 
 spawn {
@@ -124,35 +118,35 @@ spawn {
             var color = ((val2? or (not act2?)) and "255 255 255") or "255 0 0"
         }
 
-        await evt_obj?(list) and evt.state
-        iup_set(end, :ACTIVE, (evt.item == 2))
-    }
-
-```
-#if 0
-    loop {
         paror {
+            await evt_obj?(list) and evt.state
+            iup_set(end, :ACTIVE, (evt.item == 2))
         } with {
-            await isEventText [/evt,_NULL]
-            var text = evt!Iup!Text
-            var day:   _int
-            var month: _int
-            var year:  _int
-            var date:  _(char*)
-            output iup OIup.GetStr [text, _("VALUE"), /date]
-            var err: _int = _{parseDate(%date, &%day, &%month, &%year)}
-            if err {
-                output iup OIup.SetStr [text, _("VALID"), _("NO")];
+            await evt_obj?(start) or evt_obj?(end)
+            var date  = iup_get_pointer(evt.obj, :VALUE)
+            var year  = 0
+            var month = 0
+            var day   = 0
+            var ok    = false
+            ```
+                int year  = $year.Number;
+                int month = $month.Number;
+                int day   = $day.Number;
+                $ok.Bool = parse_date($date.Pointer, &day, &month, &year);
+                $year.Number  = year;
+                $month.Number = month;
+                $day.Number   = day;
+            ```
+            if ok and valid_date?(day,month,year) {
+                iup_set(evt.obj, :VALID, false)
             } else {
-                output iup OIup.SetInt [text, _("DAY"),   day];
-                output iup OIup.SetInt [text, _("MONTH"), month];
-                output iup OIup.SetInt [text, _("YEAR"),  year];
-                output iup OIup.SetStr [text, _("VALID"), _("YES")];
+                iup_set(evt.obj, :DAY,   day);
+                iup_set(evt.obj, :MONTH, month);
+                iup_set(evt.obj, :YEAR,  year);
+                iup_set(evt.obj, :VALID, true);
             }
         }
     }
-#endif
-```
 }
 
 iup_loop()
