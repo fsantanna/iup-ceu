@@ -56,13 +56,12 @@ func iup_get_number (h, name) {
 }
 
 func iup_set(h, name, value) {
-    var tag = tags(value)
-    ifs {
-        tag == :tag     -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1,ceu_tag_to_string($value.Tag)+1);`
-        tag == :bool    -> `IupSetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Bool);`
-        tag == :number  -> `IupSetFloat($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Number);`
-        tag == :pointer -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Pointer);`
-        else            -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Dyn->Vector.mem);`
+    ifs tags(value) {
+        == :tag     -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1,ceu_tag_to_string($value.Tag)+1);`
+        == :bool    -> `IupSetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Bool);`
+        == :number  -> `IupSetFloat($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Number);`
+        == :pointer -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Pointer);`
+        else        -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Dyn->Vector.mem);`
     }
 }
 
