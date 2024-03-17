@@ -1,43 +1,42 @@
-```:pre
-#include <iup.h>
+data :Iup = [h] {
+    :Action = [] {
+        :List = []
+    }
+    :Value = []
+}
 
-int c_iup_action_cb (Ihandle* h) {
-    CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value* args[1] = { &hh };
-    CEU_Block block = { 1, NULL, { NULL, NULL } };
-    CEU_Frame frame = { &ceu_mem->iup_action_cb.Dyn->Proto, &block, NULL, {} };
-    ceu_mem->iup_action_cb.Dyn->Proto.f(&frame, 1, args);
+```:pre
+int iup_action_cb (Ihandle* h) {
+    CEU_Value evt = ceu_create_tuple(1);
+    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Action} };
+    ceu_tags_set(evt, tag, 1);
+    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
+    ceux_push(CEU_GLOBAL_X->S, 1, evt);
+    ceu_broadcast_global();
+    ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
-int c_iup_value_cb (Ihandle* h) {
+
+int iup_value_cb (Ihandle* h) {
     CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value* args[1] = { &hh };
-    CEU_Block block = { 1, NULL, { NULL, NULL } };
-    CEU_Frame frame = { &ceu_mem->iup_value_cb.Dyn->Proto, &block, NULL, {} };
-    ceu_mem->iup_value_cb.Dyn->Proto.f(&frame, 1, args);
+    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Value} };
+    int ret = ceu_bcast_tasks(CEU_GLOBAL_X, CEU_ACTION_RESUME, CEU_TIME, (CEU_Dyn*) &CEU_GLOBAL_TASK);
+    assert(ret == 0);
     return IUP_DEFAULT;
 }
-int c_iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
+
+int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
+    //CEU_Value it = { CEU_VALUE_NUMBER,  {.Number=item} };
+    //CEU_Value st = { CEU_VALUE_BOOL,    {.Bool=state} };
     CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value it = { CEU_VALUE_NUMBER,  {.Number=item} };
-    CEU_Value st = { CEU_VALUE_BOOL,    {.Bool=state} };
-    CEU_Value* args[] = { &hh, &it, &st };
-    CEU_Block block = { 1, NULL, { NULL, NULL } };
-    CEU_Frame frame = { &ceu_mem->iup_list_action_cb.Dyn->Proto, &block, NULL, {} };
-    ceu_mem->iup_list_action_cb.Dyn->Proto.f(&frame, 3, args);
+    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Action_List} };
+    int ret = ceu_bcast_tasks(CEU_GLOBAL_X, CEU_ACTION_RESUME, CEU_TIME, (CEU_Dyn*) &CEU_GLOBAL_TASK);
+    assert(ret == 0);
     return IUP_DEFAULT;
 }
 ```
 
 ;; INIT
-
-func iup_open () {
-    `IupOpen(NULL, NULL);`
-}
-
-func iup_close () {
-    `IupClose();`
-}
 
 func iup_loop () {
     `IupMainLoop();`
@@ -46,56 +45,72 @@ func iup_loop () {
 ;; GET / SET
 
 func iup_get_pointer (h, name) {
-    `:pointer IupGetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
+    val s = name -> to-pointer
+    `:pointer IupGetAttribute($h.Pointer, $s.Pointer+1)`
 }
 func iup_get_bool (h, name) {
-    `:bool IupGetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
+    val s = name -> to-pointer
+    `:bool IupGetInt($h.Pointer, $s.Pointer+1)`
 }
 func iup_get_number (h, name) {
-    `:number IupGetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1)`
+    val s = name -> to-pointer
+    `:number IupGetInt($h.Pointer, $s.Pointer+1)`
 }
 
 func iup_set(h, name, value) {
-    ifs tags(value) {
-        == :tag     -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1,ceu_tag_to_string($value.Tag)+1);`
-        == :bool    -> `IupSetInt($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Bool);`
-        == :number  -> `IupSetFloat($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Number);`
-        == :pointer -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Pointer);`
-        else        -> `IupSetAttribute($h.Pointer, ceu_tag_to_string($name.Tag)+1, $value.Dyn->Vector.mem);`
+    val s = name -> to-pointer
+    ifs value {
+        :bool    => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
+        :number  => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
+        :tag     => `IupSetAttribute($h.Pointer, $s.Pointer+1,$t.Pointer+1);`
+            where {
+                val t = value -> to-pointer
+            }
+        else     => `IupSetAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
+            where {
+                val v = value -> to-pointer
+            }
     }
 }
 
 ;; CONTROLS
 
+;;;
 func iup_action_cb (h) {
-    broadcast in :global, @[(:obj,h),(:type,:action)]
+    broadcast( @[(:obj,h),(:type,:action)] )
+        in :global
 }
 func iup_value_cb (h) {
-    broadcast in :global, @[(:obj,h),(:type,:value)]
+    broadcast( @[(:obj,h),(:type,:value)]  )
+        in :global
 }
 func iup_list_action_cb (h, item, state) {
-    broadcast in :global, @[(:obj,h),(:type,:action),(:item,item),(:state,state)]
+    broadcast( @[(:obj,h),(:type,:action),(:item,item),(:state,state)] )
+        in :global
 }
+;;;
 
 func iup_button (label) {
-    var ptr = `:pointer IupButton($label.Dyn->Vector.mem, NULL)`
-    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_action_cb);`
+    val s = to-pointer(label)
+    val ptr = `:pointer IupButton($s.Pointer, NULL)`
+    `IupSetCallback($ptr.Pointer, "ACTION", iup_action_cb);`
     ptr
 }
 
 func iup_label (label) {
-    `:pointer IupLabel($label.Dyn->Vector.mem)`
+    val s = to-pointer(label)
+    `:pointer IupLabel($s.Pointer)`
 }
 
 func iup_list () {
-    var ptr = `:pointer IupList(NULL)`
-    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) c_iup_list_action_cb);`
+    val ptr = `:pointer IupList(NULL)`
+    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
     ptr
 }
 
 func iup_text () {
-    var ptr = `:pointer IupText(NULL)`
-    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", (Icallback) c_iup_value_cb);`
+    val ptr = `:pointer IupText(NULL)`
+    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", iup_value_cb);`
     ptr
 }
 
@@ -123,12 +138,9 @@ func iup_show_xy (h, x, y) {
     `:number IupShowXY($h.Pointer, $x.Number, $y.Number)`
 }
 
-;; AUX
+;; MAIN
 
-func evt_obj? (obj) {
-    tags(evt)==:dict and evt.obj==obj
-}
-
-func evt_type? (tag) {
-    tags(evt)==:dict and evt.type==tag
+`IupOpen(NULL,NULL);`
+defer {
+    `IupClose();`
 }

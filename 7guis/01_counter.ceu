@@ -1,32 +1,29 @@
 ^["iup.ceu"]
 
-iup_open()
-
 spawn {
-    var button = iup_button("Count")
+    val button = iup_button("Count")
         iup_set(button, :SIZE, "60")
 
-    var text = iup_text()
+    val text = iup_text()
         iup_set(text, :SIZE,     "60")
         iup_set(text, :READONLY, "YES")
         iup_set(text, :VALUE,    0)
 
-    var hbox = iup_hbox()
+    val hbox = iup_hbox()
         iup_append(hbox, text)
         iup_append(hbox, button)
         iup_set(hbox, :MARGIN, "10x10")
-        iup_set(hbox, :GAP, "10")
+        iup_set(hbox, :GAP,    "10")
 
-    var dlg = iup_dialog(hbox)
+    val dlg = iup_dialog(hbox)
         iup_set(dlg, :TITLE, "Counter")
 
     iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
-    every evt_obj? (button) {
-        var v = iup_get_number(text, :VALUE)
+    every (:Iup.Action, it.h==button) {
+        val v = iup_get_number(text, :VALUE)
         iup_set(text, :VALUE, v+1)
     }
 }
 
 iup_loop()
-iup_close()
