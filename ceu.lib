@@ -1,1 +1,1 @@
--g -I /usr/include/iup -l iup -include iup.c
+-g -I /usr/include/iup -l iup

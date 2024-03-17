@@ -6,6 +6,7 @@ data :Iup = [h] {
 }
 
 ```:pre
+#include <iup.h>
 int iup_action_cb (Ihandle* h) {
     CEU_Value evt = ceu_create_tuple(1);
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Action} };
@@ -18,10 +19,12 @@ int iup_action_cb (Ihandle* h) {
 }
 
 int iup_value_cb (Ihandle* h) {
-    CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
+puts("-=-=-");
+    CEU_Value evt = ceu_create_tuple(1);
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Value} };
-    int ret = ceu_bcast_tasks(CEU_GLOBAL_X, CEU_ACTION_RESUME, CEU_TIME, (CEU_Dyn*) &CEU_GLOBAL_TASK);
-    assert(ret == 0);
+    ceux_push(CEU_GLOBAL_X->S, 1, evt);
+    ceu_broadcast_global();
+    ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
 
@@ -45,30 +48,32 @@ func iup_loop () {
 ;; GET / SET
 
 func iup_get_pointer (h, name) {
-    val s = name -> to-pointer
+    val s = to-pointer(name)
     `:pointer IupGetAttribute($h.Pointer, $s.Pointer+1)`
 }
 func iup_get_bool (h, name) {
-    val s = name -> to-pointer
+    val s = to-pointer(name)
     `:bool IupGetInt($h.Pointer, $s.Pointer+1)`
 }
 func iup_get_number (h, name) {
-    val s = name -> to-pointer
+    val s = to-pointer(name)
     `:number IupGetInt($h.Pointer, $s.Pointer+1)`
 }
 
 func iup_set(h, name, value) {
-    val s = name -> to-pointer
+    val s = to-pointer(name)
     ifs value {
         :bool    => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
         :number  => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
-        :tag     => `IupSetAttribute($h.Pointer, $s.Pointer+1,$t.Pointer+1);`
+        :tag     => `IupSetAttribute($h.Pointer, $s.Pointer+1, $t.Pointer+1);`
             where {
-                val t = value -> to-pointer
+                val t = to-pointer(value)
             }
-        else     => `IupSetAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
+        else     => `IupSetStrAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
             where {
-                val v = value -> to-pointer
+                val v = to-pointer(value)
+println(:x, name, value)
+println(:y, v, to-string(v))
             }
     }
 }
@@ -92,9 +97,9 @@ func iup_list_action_cb (h, item, state) {
 
 func iup_button (label) {
     val s = to-pointer(label)
-    val ptr = `:pointer IupButton($s.Pointer, NULL)`
-    `IupSetCallback($ptr.Pointer, "ACTION", iup_action_cb);`
-    ptr
+    val h = `:pointer IupButton($s.Pointer, NULL)`
+    `IupSetCallback($h.Pointer, "ACTION", iup_action_cb);`
+    h
 }
 
 func iup_label (label) {
@@ -103,15 +108,15 @@ func iup_label (label) {
 }
 
 func iup_list () {
-    val ptr = `:pointer IupList(NULL)`
-    `IupSetCallback($ptr.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
-    ptr
+    val h = `:pointer IupList(NULL)`
+    `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
+    h
 }
 
 func iup_text () {
-    val ptr = `:pointer IupText(NULL)`
-    `IupSetCallback($ptr.Pointer, "VALUECHANGED_CB", iup_value_cb);`
-    ptr
+    val h = `:pointer IupText(NULL)`
+    `IupSetCallback($h.Pointer, "VALUECHANGED_CB", iup_value_cb);`
+    h
 }
 
 ;; CONTAINERS
