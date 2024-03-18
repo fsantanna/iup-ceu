@@ -1,20 +1,20 @@
 ^["iup.ceu"]
 
 spawn {
-    var labelC = iup-label("Celsius =")
-    var labelF = iup-label("Fahrenheit")
+    val labelC = iup-label("Celsius =")
+    val labelF = iup-label("Fahrenheit")
 
-    var tempC = iup-text()
+    val tempC = iup-text()
         iup-set(tempC, :SIZE, "50")
         iup-set(tempC, :MASK, `:pointer IUP_MASK_FLOAT`)
         iup-set(tempC, :VALUE, "")
 
-    var tempF = iup-text()
+    val tempF = iup-text()
         iup-set(tempC, :SIZE, "50")
         iup-set(tempC, :MASK, `:pointer IUP_MASK_FLOAT`)
         iup-set(tempC, :VALUE, "")
 
-    var hbox = iup-hbox()
+    val hbox = iup-hbox()
         iup-append(hbox, tempC)
         iup-append(hbox, labelC)
         iup-append(hbox, tempF)
@@ -23,22 +23,22 @@ spawn {
         iup-set(hbox, :GAP, "10")
         iup-set(hbox, :ALIGNMENT, "ACENTER")
 
-    var dlg = iup-dialog(hbox)
+    val dlg = iup-dialog(hbox)
         iup-set(dlg, :TITLE, "Temperature")
 
     iup-show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     par {
         every :Iup.Value, it.h==tempC {
-            var c = iup-get-number(tempC, :VALUE)
-            var f = (c*(9.0/5.0)) + 32
+            val c = iup-get-number(tempC, :VALUE)
+            val f = (c*(9.0/5.0)) + 32
             `static char str[16]; sprintf(str, "%.2lf", $f.Number);`
             iup-set(tempF, :VALUE, `:pointer str`)
         }
     } with {
         every :Iup.Value, it.h==tempF {
-            var f = iup-get-number(tempF, :VALUE)
-            var c = ((f-32) * 5.0) / 9.0
+            val f = iup-get-number(tempF, :VALUE)
+            val c = ((f-32) * 5.0) / 9.0
             `static char str[16]; sprintf(str, "%.2lf", $c.Number);`
             iup-set(tempC, :VALUE, `:pointer str`)
         }

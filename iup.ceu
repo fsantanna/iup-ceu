@@ -1,8 +1,9 @@
 data :Iup = [h] {
-    :Action = [] {
-        :List = []
-    }
+    :Action = []
     :Value = []
+    :List = [item,state] {
+        :Action = []
+    }
 }
 
 ```:pre
@@ -13,7 +14,11 @@ int iup_action_cb (Ihandle* h) {
     ceu_tags_set(evt, tag, 1);
     ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
     ceux_push(CEU_GLOBAL_X->S, 1, evt);
-    ceu_broadcast_global();
+    int ret = ceu_broadcast_global();
+    if (ret != 0) {
+        IupExitLoop();
+        return IUP_CLOSE;   // TODO
+    }
     ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
@@ -27,19 +32,26 @@ int iup_value_cb (Ihandle* h) {
     int ret = ceu_broadcast_global();
     if (ret != 0) {
         IupExitLoop();
-        return IUP_CLOSE;
+        return IUP_CLOSE;   // TODO
     }
     ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
 
 int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
-    //CEU_Value it = { CEU_VALUE_NUMBER,  {.Number=item} };
-    //CEU_Value st = { CEU_VALUE_BOOL,    {.Bool=state} };
-    CEU_Value hh = { CEU_VALUE_POINTER, {.Pointer=h} };
-    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Action_List} };
-    int ret = ceu_bcast_tasks(CEU_GLOBAL_X, CEU_ACTION_RESUME, CEU_TIME, (CEU_Dyn*) &CEU_GLOBAL_TASK);
-    assert(ret == 0);
+    CEU_Value evt = ceu_create_tuple(3);
+    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_List_Action} };
+    ceu_tags_set(evt, tag, 1);
+    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
+    ceu_tuple_set(&evt.Dyn->Tuple, 1, (CEU_Value) { CEU_VALUE_NUMBER,  {.Number=item} });
+    ceu_tuple_set(&evt.Dyn->Tuple, 2, (CEU_Value) { CEU_VALUE_BOOL,    {.Bool=state} });
+    ceux_push(CEU_GLOBAL_X->S, 1, evt);
+    int ret = ceu_broadcast_global();
+    if (ret != 0) {
+        IupExitLoop();
+        return IUP_CLOSE;   // TODO
+    }
+    ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
 ```
