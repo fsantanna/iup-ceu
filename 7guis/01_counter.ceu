@@ -1,4 +1,4 @@
-^["iup.ceu"]
+^["@/iup/iup.ceu"]
 
 spawn {
     val button = iup-button("Count")
