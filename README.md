@@ -21,9 +21,8 @@ rm -Rf tmp/
 
 - Compile and execute a test program:
 
-<!-- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64-->
-
 ```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 gcc -o hello -I /usr/include/iup hello.c -l iup
 ./hello
 ```
