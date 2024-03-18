@@ -1,8 +1,8 @@
 ^["iup.ceu"]
 
-iup_open()
+iup-open()
 
-func valid_date?(day, month, year) {
+func valid-date?(day, month, year) {
     var leap? = (year%400==0) or ((year%4==0) and (year%100/=0))
     ifs {
         (day < 1) -> 0
@@ -69,61 +69,61 @@ int parse_date (char* date, int* day, int* month, int* year) {
 ```
 
 spawn {
-    var list = iup_list()
-        iup_set(list, :EXPAND,   "HORIZONTAL")
-        iup_set(list, :DROPDOWN, true)
-        iup_set(list, :1,        "one-way flight")
-        iup_set(list, :2,        "return flight")
-        iup_set(list, :VALUE,    :1)
+    var list = iup-list()
+        iup-set(list, :EXPAND,   "HORIZONTAL")
+        iup-set(list, :DROPDOWN, true)
+        iup-set(list, :1,        "one-way flight")
+        iup-set(list, :2,        "return flight")
+        iup-set(list, :VALUE,    :1)
 
-    var start = iup_text()
-        iup_set(start, :EXPAND, "HORIZONTAL")
-        iup_set(start, :VALID,  true)
-        iup_set(start, :VALUE,  "22.09.1957")
-        iup_set(start, :DAY,    "22")
-        iup_set(start, :MONTH,  "09")
-        iup_set(start, :YEAR,   "1957")
+    var start = iup-text()
+        iup-set(start, :EXPAND, "HORIZONTAL")
+        iup-set(start, :VALID,  true)
+        iup-set(start, :VALUE,  "22.09.1957")
+        iup-set(start, :DAY,    "22")
+        iup-set(start, :MONTH,  "09")
+        iup-set(start, :YEAR,   "1957")
 
-    var end = iup_text()
-        iup_set(end, :EXPAND, "HORIZONTAL")
-        iup_set(end, :VALID,  true)
-        iup_set(end, :VALUE,  "22.09.1957")
-        iup_set(end, :DAY,    "22")
-        iup_set(end, :MONTH,  "09")
-        iup_set(end, :YEAR,   "1957")
-        iup_set(end, :ACTIVE, false)
+    var end = iup-text()
+        iup-set(end, :EXPAND, "HORIZONTAL")
+        iup-set(end, :VALID,  true)
+        iup-set(end, :VALUE,  "22.09.1957")
+        iup-set(end, :DAY,    "22")
+        iup-set(end, :MONTH,  "09")
+        iup-set(end, :YEAR,   "1957")
+        iup-set(end, :ACTIVE, false)
 
-    var button = iup_button("Book")
-        iup_set(button, :EXPAND, false)
-        iup_set(button, :EXPAND, "HORIZONTAL")
+    var button = iup-button("Book")
+        iup-set(button, :EXPAND, false)
+        iup-set(button, :EXPAND, "HORIZONTAL")
 
-    var vbox = iup_vbox()
-        iup_set(vbox, :MARGIN, "10x10")
-        iup_set(vbox, :GAP, "10")
-        iup_append(vbox, list)
-        iup_append(vbox, start)
-        iup_append(vbox, end)
-        iup_append(vbox, button)
+    var vbox = iup-vbox()
+        iup-set(vbox, :MARGIN, "10x10")
+        iup-set(vbox, :GAP, "10")
+        iup-append(vbox, list)
+        iup-append(vbox, start)
+        iup-append(vbox, end)
+        iup-append(vbox, button)
 
-    var dlg = iup_dialog(vbox)
-        iup_set(dlg, :TITLE, "Book Flight")
+    var dlg = iup-dialog(vbox)
+        iup-set(dlg, :TITLE, "Book Flight")
 
-    iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
+    iup-show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     while true {
-        var act2? = iup_get_bool(end, :ACTIVE)
-        var val2? = iup_get_bool(end, :VALID)
+        var act2? = iup-get-bool(end, :ACTIVE)
+        var val2? = iup-get-bool(end, :VALID)
 
-        iup_set(end, :BGCOLOR, color) where {
+        iup-set(end, :BGCOLOR, color) where {
             var color = ((val2? or (not act2?)) and "255 255 255") or "255 0 0"
         }
 
         paror {
-            await evt_obj?(list) and evt.state
-            iup_set(end, :ACTIVE, (evt.item == 2))
+            await evt-obj?(list) and evt.state
+            iup-set(end, :ACTIVE, (evt.item == 2))
         } with {
-            await evt_obj?(start) or evt_obj?(end)
-            var date  = iup_get_pointer(evt.obj, :VALUE)
+            await evt-obj?(start) or evt-obj?(end)
+            var date  = iup-get-pointer(evt.obj, :VALUE)
             var year  = 0
             var month = 0
             var day   = 0
@@ -137,17 +137,17 @@ spawn {
                 $month.Number = month;
                 $day.Number   = day;
             ```
-            if ok and valid_date?(day,month,year) {
-                iup_set(evt.obj, :VALID, false)
+            if ok and valid-date?(day,month,year) {
+                iup-set(evt.obj, :VALID, false)
             } else {
-                iup_set(evt.obj, :DAY,   day);
-                iup_set(evt.obj, :MONTH, month);
-                iup_set(evt.obj, :YEAR,  year);
-                iup_set(evt.obj, :VALID, true);
+                iup-set(evt.obj, :DAY,   day);
+                iup-set(evt.obj, :MONTH, month);
+                iup-set(evt.obj, :YEAR,  year);
+                iup-set(evt.obj, :VALID, true);
             }
         }
     }
 }
 
-iup_loop()
-iup_close()
+iup-loop()
+iup-close()

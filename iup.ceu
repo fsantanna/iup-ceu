@@ -46,26 +46,26 @@ int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
 
 ;; INIT
 
-func iup_loop () {
+func iup-loop () {
     `IupMainLoop();`
 }
 
 ;; GET / SET
 
-func iup_get_pointer (h, name) {
+func iup-get-pointer (h, name) {
     val s = to-pointer(name)
     `:pointer IupGetAttribute($h.Pointer, $s.Pointer+1)`
 }
-func iup_get_bool (h, name) {
+func iup-get-bool (h, name) {
     val s = to-pointer(name)
     `:bool IupGetInt($h.Pointer, $s.Pointer+1)`
 }
-func iup_get_number (h, name) {
+func iup-get-number (h, name) {
     val s = to-pointer(name)
     `:number IupGetInt($h.Pointer, $s.Pointer+1)`
 }
 
-func iup_set(h, name, value) {
+func iup-set(h, name, value) {
     val s = to-pointer(name)
     ifs value {
         :bool    => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
@@ -83,40 +83,25 @@ func iup_set(h, name, value) {
 
 ;; CONTROLS
 
-;;;
-func iup_action_cb (h) {
-    broadcast( @[(:obj,h),(:type,:action)] )
-        in :global
-}
-func iup_value_cb (h) {
-    broadcast( @[(:obj,h),(:type,:value)]  )
-        in :global
-}
-func iup_list_action_cb (h, item, state) {
-    broadcast( @[(:obj,h),(:type,:action),(:item,item),(:state,state)] )
-        in :global
-}
-;;;
-
-func iup_button (label) {
+func iup-button (label) {
     val s = to-pointer(label)
     val h = `:pointer IupButton($s.Pointer, NULL)`
     `IupSetCallback($h.Pointer, "ACTION", iup_action_cb);`
     h
 }
 
-func iup_label (label) {
+func iup-label (label) {
     val s = to-pointer(label)
     `:pointer IupLabel($s.Pointer)`
 }
 
-func iup_list () {
+func iup-list () {
     val h = `:pointer IupList(NULL)`
     `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
     h
 }
 
-func iup_text () {
+func iup-text () {
     val h = `:pointer IupText(NULL)`
     `IupSetCallback($h.Pointer, "VALUECHANGED_CB", iup_value_cb);`
     h
@@ -124,25 +109,25 @@ func iup_text () {
 
 ;; CONTAINERS
 
-func iup_hbox () {
+func iup-hbox () {
     `:pointer IupHbox(NULL)`
 }
 
-func iup_vbox () {
+func iup-vbox () {
     `:pointer IupVbox(NULL)`
 }
 
-func iup_append (h, child) {
+func iup-append (h, child) {
     `:pointer IupAppend($h.Pointer, $child.Pointer)`
 }
 
 ;; DIALOGS
 
-func iup_dialog (h) {
+func iup-dialog (h) {
     `:pointer IupDialog($h.Pointer)`
 }
 
-func iup_show_xy (h, x, y) {
+func iup-show-xy (h, x, y) {
     `:number IupShowXY($h.Pointer, $x.Number, $y.Number)`
 }
 

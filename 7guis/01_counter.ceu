@@ -1,29 +1,29 @@
 ^["iup.ceu"]
 
 spawn {
-    val button = iup_button("Count")
-        iup_set(button, :SIZE, "60")
+    val button = iup-button("Count")
+        iup-set(button, :SIZE, "60")
 
-    val text = iup_text()
-        iup_set(text, :SIZE,     "60")
-        iup_set(text, :READONLY, "YES")
-        iup_set(text, :VALUE,    0)
+    val text = iup-text()
+        iup-set(text, :SIZE,     "60")
+        iup-set(text, :READONLY, "YES")
+        iup-set(text, :VALUE,    0)
 
-    val hbox = iup_hbox()
-        iup_append(hbox, text)
-        iup_append(hbox, button)
-        iup_set(hbox, :MARGIN, "10x10")
-        iup_set(hbox, :GAP,    "10")
+    val hbox = iup-hbox()
+        iup-append(hbox, text)
+        iup-append(hbox, button)
+        iup-set(hbox, :MARGIN, "10x10")
+        iup-set(hbox, :GAP,    "10")
 
-    val dlg = iup_dialog(hbox)
-        iup_set(dlg, :TITLE, "Counter")
+    val dlg = iup-dialog(hbox)
+        iup-set(dlg, :TITLE, "Counter")
 
-    iup_show_xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
+    iup-show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     every (:Iup.Action, it.h==button) {
-        val v = iup_get_number(text, :VALUE)
-        iup_set(text, :VALUE, v+1)
+        val v = iup-get-number(text, :VALUE)
+        iup-set(text, :VALUE, v+1)
     }
 }
 
-iup_loop()
+iup-loop()
