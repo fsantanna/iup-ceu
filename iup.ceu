@@ -19,11 +19,16 @@ int iup_action_cb (Ihandle* h) {
 }
 
 int iup_value_cb (Ihandle* h) {
-puts("-=-=-");
     CEU_Value evt = ceu_create_tuple(1);
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Value} };
+    ceu_tags_set(evt, tag, 1);
+    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
     ceux_push(CEU_GLOBAL_X->S, 1, evt);
-    ceu_broadcast_global();
+    int ret = ceu_broadcast_global();
+    if (ret != 0) {
+        IupExitLoop();
+        return IUP_CLOSE;
+    }
     ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
@@ -72,8 +77,6 @@ func iup_set(h, name, value) {
         else     => `IupSetStrAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
             where {
                 val v = to-pointer(value)
-println(:x, name, value)
-println(:y, v, to-string(v))
             }
     }
 }
