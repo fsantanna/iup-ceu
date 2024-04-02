@@ -1,4 +1,4 @@
-^["@/iup/iup.ceu"]
+^["@/iup/iup-ceu/iup.ceu"]
 
 data :Date = [d,m,y]
 
