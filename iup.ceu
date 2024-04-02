@@ -81,7 +81,9 @@ func iup-set(h, name, value) {
     val s = to-pointer(name)
     ifs value {
         :bool    => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
-        :number  => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
+        :number  => if math-floor(value) == value
+                        => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Number);`
+                        => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
         :tag     => `IupSetAttribute($h.Pointer, $s.Pointer+1, $t.Pointer+1);`
             where {
                 val t = to-pointer(value)
