@@ -119,6 +119,13 @@ func iup-text () {
     h
 }
 
+func iup-timer () {
+    val h = `:pointer IupTimer()`
+    `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
+    h
+}
+
+
 ;; CONTAINERS
 
 func iup-hbox () {

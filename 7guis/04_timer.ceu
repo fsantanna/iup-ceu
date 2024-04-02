@@ -1,0 +1,28 @@
+^["@/iup/iup-ceu/iup.ceu"]
+
+spawn {
+    val labelET = iup-label("Elapsed Time: ")
+    val labelTemp_s = iup-label("0.0s")
+    val labelDur = iup-label("Duration: ")
+
+    val timer = iup-timer()
+        iup-set(timer, :TIME, "100");
+        iup-set(timer, :TOTALELAPSEDTIME, "0");
+
+    val hbox = iup-hbox()
+        iup-append(hbox, labelET)
+        iup-append(hbox, timer)
+        iup-append(hbox, labelTemp_s)
+        iup-append(hbox, labelDur)
+        iup-set(hbox, :MARGIN, "10x10")
+        iup-set(hbox, :GAP, "10")
+        iup-set(hbox, :ALIGNMENT, "ACENTER")
+
+    val dlg = iup-dialog(hbox)
+        iup-set(dlg, :TITLE, "Timer")
+        iup-set(dlg, :SIZE, "200")
+
+    iup-show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
+}
+
+iup-loop()
