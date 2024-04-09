@@ -23,6 +23,6 @@ rm -Rf tmp/
 
 ```
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
-gcc -o hello -I /usr/include/iup hello.c -l iup
+gcc -o hello -I /usr/include/iup hello.c -l iup -l iupimglib
 ./hello
 ```
