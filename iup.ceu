@@ -6,155 +6,190 @@ data :Iup = [h] {
     }
 }
 
+data :IUP = [
+    loop,
+    get :PICO-Get = [pointer,bool,number],
+    set,
+    button, label, list, text,
+    hbox, vbox, append,
+    dialog, show-xy
+]
+
 ```:pre
 #include <iup.h>
 int iup_action_cb (Ihandle* h) {
-    CEU_Value evt = ceu_create_tuple(1);
+    CEU_Value args[] = {
+        { CEU_VALUE_POINTER, {.Pointer=h} }
+    };
+    CEU_Value evt = ceu_create_tuple(1, 1, args CEU_LEX_X(COMMA 1));
+    ceu_gc_inc_val(evt);
+
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Action} };
-    ceu_tags_set(evt, tag, 1);
-    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
-    ceux_push(CEU_GLOBAL_X->S, 1, evt);
-    int ret = ceu_broadcast_global();
-    if (ret != 0) {
+    ceu_tag_set(tag, evt);
+
+    ceu_broadcast_global(evt);
+    ceu_gc_dec_val(evt);
+
+    if (CEU_ERROR != CEU_ERROR_NONE) {
         IupExitLoop();
         return IUP_CLOSE;   // TODO
     }
-    ceux_pop(CEU_GLOBAL_X->S, 1);
+
     return IUP_DEFAULT;
 }
 
 int iup_value_cb (Ihandle* h) {
-    CEU_Value evt = ceu_create_tuple(1);
+    CEU_Value args[] = {
+        { CEU_VALUE_POINTER, {.Pointer=h} }
+    };
+    CEU_Value evt = ceu_create_tuple(1, 1, args CEU_LEX_X(COMMA 1));
+    ceu_gc_inc_val(evt);
+
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_Value} };
-    ceu_tags_set(evt, tag, 1);
-    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
-    ceux_push(CEU_GLOBAL_X->S, 1, evt);
-    int ret = ceu_broadcast_global();
-    if (ret != 0) {
+    ceu_tag_set(tag, evt);
+
+    ceu_broadcast_global(evt);
+    ceu_gc_dec_val(evt);
+
+    if (CEU_ERROR != CEU_ERROR_NONE) {
         IupExitLoop();
         return IUP_CLOSE;   // TODO
     }
-    ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
 
 int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
-    CEU_Value evt = ceu_create_tuple(3);
+    CEU_Value args[] = {
+        { CEU_VALUE_POINTER, {.Pointer=h}   },
+        { CEU_VALUE_NUMBER,  {.Number=item} },
+        { CEU_VALUE_BOOL,    {.Bool=state}  }
+    };
+    CEU_Value evt = ceu_create_tuple(1, 3, args CEU_LEX_X(COMMA 1));
+    ceu_gc_inc_val(evt);
+
     CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Iup_List_Action} };
-    ceu_tags_set(evt, tag, 1);
-    ceu_tuple_set(&evt.Dyn->Tuple, 0, (CEU_Value) { CEU_VALUE_POINTER, {.Pointer=h} });
-    ceu_tuple_set(&evt.Dyn->Tuple, 1, (CEU_Value) { CEU_VALUE_NUMBER,  {.Number=item} });
-    ceu_tuple_set(&evt.Dyn->Tuple, 2, (CEU_Value) { CEU_VALUE_BOOL,    {.Bool=state} });
-    ceux_push(CEU_GLOBAL_X->S, 1, evt);
-    int ret = ceu_broadcast_global();
-    if (ret != 0) {
+    ceu_tag_set(tag, evt);
+
+    ceu_broadcast_global(evt);
+    ceu_gc_dec_val(evt);
+
+    if (CEU_ERROR != CEU_ERROR_NONE) {
         IupExitLoop();
         return IUP_CLOSE;   // TODO
     }
-    ceux_pop(CEU_GLOBAL_X->S, 1);
     return IUP_DEFAULT;
 }
 ```
-
-;; INIT
-
-func iup-loop () {
-    `IupMainLoop();`
-}
-
-;; GET / SET
-
-func iup-get-pointer (h, name) {
-    val s = to-pointer(name)
-    `:pointer IupGetAttribute($h.Pointer, $s.Pointer+1)`
-}
-func iup-get-bool (h, name) {
-    val s = to-pointer(name)
-    `:bool IupGetInt($h.Pointer, $s.Pointer+1)`
-}
-func iup-get-number (h, name) {
-    val s = to-pointer(name)
-    `:number IupGetInt($h.Pointer, $s.Pointer+1)`
-}
-
-func iup-set(h, name, value) {
-    val s = to-pointer(name)
-    ifs value {
-        :bool    => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
-        :number  => if math-floor(value) == value
-                        => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Number);`
-                        => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
-        :tag     => `IupSetAttribute($h.Pointer, $s.Pointer+1, $t.Pointer+1);`
-            where {
-                val t = to-pointer(value)
-            }
-        else     => `IupSetStrAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
-            where {
-                val v = to-pointer(value)
-            }
-    }
-}
-
-;; CONTROLS
-
-func iup-button (label) {
-    val s = to-pointer(label)
-    val h = `:pointer IupButton($s.Pointer, NULL)`
-    `IupSetCallback($h.Pointer, "ACTION", iup_action_cb);`
-    h
-}
-
-func iup-label (label) {
-    val s = to-pointer(label)
-    `:pointer IupLabel($s.Pointer)`
-}
-
-func iup-list () {
-    val h = `:pointer IupList(NULL)`
-    `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
-    h
-}
-
-func iup-text () {
-    val h = `:pointer IupText(NULL)`
-    `IupSetCallback($h.Pointer, "VALUECHANGED_CB", iup_value_cb);`
-    h
-}
-
-func iup-timer () {
-    val h = `:pointer IupTimer()`
-    `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
-    h
-}
-
-
-;; CONTAINERS
-
-func iup-hbox () {
-    `:pointer IupHbox(NULL)`
-}
-
-func iup-vbox () {
-    `:pointer IupVbox(NULL)`
-}
-
-func iup-append (h, child) {
-    `:pointer IupAppend($h.Pointer, $child.Pointer)`
-}
-
-;; DIALOGS
-
-func iup-dialog (h) {
-    `:pointer IupDialog($h.Pointer)`
-}
-
-func iup-show-xy (h, x, y) {
-    `:number IupShowXY($h.Pointer, $x.Number, $y.Number)`
-}
 
 ;; MAIN
 
 `IupOpen(NULL,NULL);`
 defer {
     `IupClose();`
+}
+
+;; IUP
+
+val iup :IUP = group {
+
+    ;; INIT
+
+    func x-iup-loop () {
+        `IupMainLoop();`
+    }
+
+    ;; GET / SET
+
+    val x-iup-get :IUP.Get = group {
+        func x-iup-get-pointer (h, name) {
+            val s = to.pointer(name)
+            `:pointer IupGetAttribute($h.Pointer, $s.Pointer+1)`
+        }
+        func x-iup-get-bool (h, name) {
+            val s = to.pointer(name)
+            `:bool IupGetInt($h.Pointer, $s.Pointer+1)`
+        }
+        func x-iup-get-number (h, name) {
+            val s = to.pointer(name)
+            `:number IupGetInt($h.Pointer, $s.Pointer+1)`
+        }
+        [x-iup-get-pointer, x-iup-get-bool, x-iup-get-number]
+    }
+
+    func x-iup-set (h, name, value) {
+        val s = to-pointer(name)
+        match value {
+            :bool   => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Bool);`
+            :number => if math.floor(value) == value
+                        => `IupSetInt($h.Pointer, $s.Pointer+1, $value.Number);`
+                        => `IupSetFloat($h.Pointer, $s.Pointer+1, $value.Number);`
+            :tag    => `IupSetAttribute($h.Pointer, $s.Pointer+1, $t.Pointer+1);`
+                where {
+                    val t = to.pointer(value)
+                }
+            else    => `IupSetStrAttribute($h.Pointer, $s.Pointer+1, $v.Pointer);`
+                where {
+                    val v = to.pointer(value)
+                }
+        }
+    }
+
+    ;; CONTROLS
+
+    func x-iup-button (label) {
+        val s = to.pointer(label)
+        val h = `:pointer IupButton($s.Pointer, NULL)`
+        `IupSetCallback($h.Pointer, "ACTION", iup_action_cb);`
+        h
+    }
+
+    func x-iup-label (label) {
+        val s = to.pointer(label)
+        `:pointer IupLabel($s.Pointer)`
+    }
+
+    func x-iup-list () {
+        val h = `:pointer IupList(NULL)`
+        `IupSetCallback($h.Pointer, "ACTION", (Icallback) iup_list_action_cb);`
+        h
+    }
+
+    func x-iup-text () {
+        val h = `:pointer IupText(NULL)`
+        `IupSetCallback($h.Pointer, "VALUECHANGED_CB", iup_value_cb);`
+        h
+    }
+
+    ;; CONTAINERS
+
+    func x-iup-hbox () {
+        `:pointer IupHbox(NULL)`
+    }
+
+    func x-iup-vbox () {
+        `:pointer IupVbox(NULL)`
+    }
+
+    func x-iup-append (h, child) {
+        `:pointer IupAppend($h.Pointer, $child.Pointer)`
+    }
+
+    ;; DIALOGS
+
+    func x-iup-dialog (h) {
+        `:pointer IupDialog($h.Pointer)`
+    }
+
+    func x-iup-show-xy (h, x, y) {
+        `:number IupShowXY($h.Pointer, $x.Number, $y.Number)`
+    }
+
+    ;; RETURN
+
+    [
+        x-iup-loop, x-iup-get, x-iup-set,
+        x-iup-button, x-iup-label, x-iup-list, x-iup-text,
+        x-iup-hbox, x-iup-vbox, x-iup-append,
+        x-iup-dialog, x-iup-show-xy,
+    ]
 }
