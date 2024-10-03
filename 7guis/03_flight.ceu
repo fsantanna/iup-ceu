@@ -1,4 +1,4 @@
-^["@/iup/iup-ceu/iup.ceu"]
+^["@/iup/iup.ceu"]
 
 data :Date = [d,m,y]
 
@@ -39,75 +39,75 @@ func to-date (s) {
 }
 
 spawn {
-    val list = iup-list()
-        iup-set(list, :EXPAND,   "HORIZONTAL")
-        iup-set(list, :DROPDOWN, true)
-        iup-set(list, :1,        "one-way flight")
-        iup-set(list, :2,        "return flight")
-        iup-set(list, :VALUE,    :1)
+    val list = iup.list()
+        iup.set(list, :EXPAND,   "HORIZONTAL")
+        iup.set(list, :DROPDOWN, true)
+        iup.set(list, :1,        "one-way flight")
+        iup.set(list, :2,        "return flight")
+        iup.set(list, :VALUE,    :1)
 
-    val start = iup-text()
-        iup-set(start, :EXPAND, "HORIZONTAL")
-        iup-set(start, :VALID,  true)
-        iup-set(start, :VALUE,  "22.09.1957")
-        iup-set(start, :DAY,    "22")
-        iup-set(start, :MONTH,  "09")
-        iup-set(start, :YEAR,   "1957")
+    val start = iup.text()
+        iup.set(start, :EXPAND, "HORIZONTAL")
+        iup.set(start, :VALID,  true)
+        iup.set(start, :VALUE,  "22.09.1957")
+        iup.set(start, :DAY,    "22")
+        iup.set(start, :MONTH,  "09")
+        iup.set(start, :YEAR,   "1957")
 
-    val end = iup-text()
-        iup-set(end, :EXPAND, "HORIZONTAL")
-        iup-set(end, :VALID,  true)
-        iup-set(end, :VALUE,  "22.09.1957")
-        iup-set(end, :DAY,    "22")
-        iup-set(end, :MONTH,  "09")
-        iup-set(end, :YEAR,   "1957")
-        iup-set(end, :ACTIVE, false)
+    val end = iup.text()
+        iup.set(end, :EXPAND, "HORIZONTAL")
+        iup.set(end, :VALID,  true)
+        iup.set(end, :VALUE,  "22.09.1957")
+        iup.set(end, :DAY,    "22")
+        iup.set(end, :MONTH,  "09")
+        iup.set(end, :YEAR,   "1957")
+        iup.set(end, :ACTIVE, false)
 
-    val button = iup-button("Book")
-        iup-set(button, :EXPAND, false)
-        iup-set(button, :EXPAND, "HORIZONTAL")
+    val button = iup.button("Book")
+        iup.set(button, :EXPAND, false)
+        iup.set(button, :EXPAND, "HORIZONTAL")
 
-    val vbox = iup-vbox()
-        iup-set(vbox, :MARGIN, "10x10")
-        iup-set(vbox, :GAP, "10")
-        iup-append(vbox, list)
-        iup-append(vbox, start)
-        iup-append(vbox, end)
-        iup-append(vbox, button)
+    val vbox = iup.vbox()
+        iup.set(vbox, :MARGIN, "10x10")
+        iup.set(vbox, :GAP, "10")
+        iup.append(vbox, list)
+        iup.append(vbox, start)
+        iup.append(vbox, end)
+        iup.append(vbox, button)
 
-    val dlg = iup-dialog(vbox)
-        iup-set(dlg, :TITLE, "Book Flight")
+    val dlg = iup.dialog(vbox)
+        iup.set(dlg, :TITLE, "Book Flight")
 
-    iup-show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
+    iup.show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
 
     loop {
-        val act2? = iup-get-bool(end, :ACTIVE)
-        val val2? = iup-get-bool(end, :VALID)
+        val act2? = iup.get.bool(end, :ACTIVE)
+        val val2? = iup.get.bool(end, :VALID)
 
-        iup-set(end, :BGCOLOR, color) where {
+        iup.set(end, :BGCOLOR, color) where {
             val color = ((val2? or (not act2?)) and "255 255 255") or "255 0 0"
         }
 
         par-or {
-            await :Iup.List.Action, (it.h==list) and it.state {
-                iup-set(end, :ACTIVE, (it.item == 2))
+            await :Iup.List.Action | (it.h==list) and it.state {
+                iup.set(end, :ACTIVE, (it.item == 2))
             }
         } with {
-            await :Iup.Value, (it.h==start) or (it.h==end) {
+            await :Iup.Value | (it.h==start) or (it.h==end) {
                 val date :Date = catch {
-                    iup-get-pointer(it.h,:VALUE) -> to-string -> to-date
+                    iup.get.pointer(it.h,:VALUE) -> to-string -> to-date
                 }
                 if date == :assert {
-                    iup-set(it.h, :VALID, false)
+                    iup.set(it.h, :VALID, false)
                 } else {
-                    iup-set(it.h, :VALID, true);
-                    iup-set(it.h, :DAY,   date.d);
-                    iup-set(it.h, :MONTH, date.m);
-                    iup-set(it.h, :YEAR,  date.y);
+                    iup.set(it.h, :VALID, true);
+                    iup.set(it.h, :DAY,   date.d);
+                    iup.set(it.h, :MONTH, date.m);
+                    iup.set(it.h, :YEAR,  date.y);
                 }
             }
         }
     }
 }
 
-iup-loop()
+iup.loop()
