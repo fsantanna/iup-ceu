@@ -10,9 +10,9 @@ spawn {
         iup.set(tempC, :VALUE, "")
 
     val tempF = iup.text()
-        iup.set(tempC, :SIZE, "50")
-        iup.set(tempC, :MASK, `:pointer IUP_MASK_FLOAT`)
-        iup.set(tempC, :VALUE, "")
+        iup.set(tempF, :SIZE, "50")
+        iup.set(tempF, :MASK, `:pointer IUP_MASK_FLOAT`)
+        iup.set(tempF, :VALUE, "")
 
     val hbox = iup.hbox()
         iup.append(hbox, tempC)
