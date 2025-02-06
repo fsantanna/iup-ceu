@@ -19,10 +19,16 @@ cd ..
 rm -Rf tmp/
 ```
 
-- Compile and execute a test program:
+- Compile and execute a test program in C:
 
 ```
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 gcc -o hello -I /usr/include/iup hello.c -l iup
 ./hello
+```
+
+- Execute a test program in Ceu:
+
+```
+ceu --lib=iup tst/01-clock.ceu
 ```

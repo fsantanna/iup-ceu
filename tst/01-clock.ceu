@@ -1,0 +1,9 @@
+^["@/iup/iup.ceu"]
+
+spawn {
+    every <1:s> {
+        println("passou 1 segundo")
+    }
+}
+
+iup.loop()

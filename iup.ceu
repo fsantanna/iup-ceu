@@ -80,6 +80,26 @@ int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
     }
     return IUP_DEFAULT;
 }
+
+int iup_timer_cb (Ihandle* h) {
+    CEU_Value args[] = {
+        { CEU_VALUE_NUMBER, {.Number=50} }
+    };
+    CEU_Value evt = ceu_create_tuple(1, 1, args CEU_LEX_X(COMMA 1));
+    ceu_gc_inc_val(evt);
+
+    CEU_Value tag = { CEU_VALUE_TAG, {.Tag=CEU_TAG_Clock} };
+    ceu_tag_set(tag, evt);
+
+    ceu_broadcast_global(evt);
+    ceu_gc_dec_val(evt);
+
+    if (CEU_ERROR != CEU_ERROR_NONE) {
+        IupExitLoop();
+        return IUP_CLOSE;   // TODO
+    }
+    return IUP_DEFAULT;
+}
 ```
 
 ;; MAIN
@@ -96,7 +116,13 @@ val iup :IUP = group {
     ;; INIT
 
     func x-iup-loop () {
-        `IupMainLoop();`
+        ```
+        Ihandle* iup_timer = IupTimer();
+        IupSetAttribute(iup_timer, "TIME", "50");
+        IupSetAttribute(iup_timer, "RUN", "YES");
+        IupSetCallback(iup_timer, "ACTION_CB", (Icallback)iup_timer_cb);
+        IupMainLoop();
+        ```
     }
 
     ;; GET / SET
