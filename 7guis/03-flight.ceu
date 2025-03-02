@@ -14,11 +14,16 @@ func to-date (s) {
         }
     }
     set vec[+] = sub
-    assert(#vec == 3)
+    ifs {
+        (#vec /= 3)    => error(:date)
+        (#vec[0] /= 2) => error(:date)
+        (#vec[1] /= 2) => error(:date)
+        (#vec[2] /= 4) => error(:date)
+    }
 
     val tup :Date = tuple(3)
     loop i in {0 => 2} {
-        set tup[i] = vec[i] -> to.number -> assert
+        set tup[i] = vec[i] -> to-number -> assert
     }
 
     val valid? = do {
@@ -35,7 +40,7 @@ func to-date (s) {
     }
     assert(valid?)
 
-    tup
+    drop(tup)
 }
 
 spawn {
@@ -89,15 +94,15 @@ spawn {
         }
 
         par-or {
-            await :Iup.List.Action | (it.h==list) and it.state {
+            await :Iup.List.Action | (it.h==list) and (it.state) {
                 iup.set(end, :ACTIVE, (it.item == 2))
             }
         } with {
             await :Iup.Value | (it.h==start) or (it.h==end) {
-                val date :Date = catch {
-                    iup.get.pointer(it.h,:VALUE) -> to.string -> to-date
+                val date :Date = catch :date {
+                    iup.get.pointer(it.h,:VALUE) -> to-string -> to-date
                 }
-                if date == :assert {
+                if date == :date {
                     iup.set(it.h, :VALID, false)
                 } else {
                     iup.set(it.h, :VALID, true);

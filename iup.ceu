@@ -10,7 +10,7 @@ data :IUP = [
     loop,
     get :PICO-Get = [pointer,bool,number],
     set,
-    button, label, list, text,
+    button, label, gauge, val, list, text,
     hbox, vbox, append,
     dialog, show-xy
 ]
@@ -60,7 +60,6 @@ int iup_value_cb (Ihandle* h) {
 
 int iup_list_action_cb (Ihandle* h, char *text, int item, int state) {
     CEU_Value args[] = {
-        { CEU_VALUE_POINTER, {.Pointer=h}   },
         { CEU_VALUE_POINTER, {.Pointer=h}   },
         { CEU_VALUE_NUMBER,  {.Number=item} },
         { CEU_VALUE_BOOL,    {.Bool=state}  }
@@ -138,7 +137,7 @@ val iup :IUP = group {
         }
         func x-iup-get-number (h, name) {
             val s = to.pointer(name)
-            `:number IupGetInt($h.Pointer, $s.Pointer+1)`
+            `:number IupGetFloat($h.Pointer, $s.Pointer+1)`
         }
         [x-iup-get-pointer, x-iup-get-bool, x-iup-get-number]
     }
@@ -173,6 +172,18 @@ val iup :IUP = group {
     func x-iup-label (label) {
         val s = to.pointer(label)
         `:pointer IupLabel($s.Pointer)`
+    }
+
+    func x-iup-gauge () {
+        val h = `:pointer IupGauge()`
+        h
+    }
+
+    func x-iup-val (label) {
+        val s = to.pointer(label)
+        val h = `:pointer IupVal($s.Pointer)`
+        `IupSetCallback($h.Pointer, "VALUECHANGED_CB", iup_value_cb);`
+        h
     }
 
     func x-iup-list () {
@@ -215,7 +226,7 @@ val iup :IUP = group {
 
     [
         x-iup-loop, x-iup-get, x-iup-set,
-        x-iup-button, x-iup-label, x-iup-list, x-iup-text,
+        x-iup-button, x-iup-label, x-iup-gauge, x-iup-val, x-iup-list, x-iup-text,
         x-iup-hbox, x-iup-vbox, x-iup-append,
         x-iup-dialog, x-iup-show-xy,
     ]

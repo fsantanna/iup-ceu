@@ -1,0 +1,76 @@
+^["@/iup/iup.ceu"]
+
+;;;
+func timer_cb (s) {
+
+
+}
+;;;
+
+spawn {
+    val labelET = iup.label("Elapsed Time: ")
+    val labelTemp_s = iup.label("0.0s")
+        iup.set(labelTemp_s, :NAME, "LABEL");
+        iup.set(labelTemp_s, :EXPAND, "HORIZONTAL");
+    val labelDur = iup.label("Duration: ")
+
+    val gauge = iup.gauge()
+        iup.set(gauge, :NAME, "GAUGE");    
+        iup.set(gauge, :MIN, ".1");
+        iup.set(gauge, :MAX, "30");
+        iup.set(gauge, :VALUE, "30");
+        iup.set(gauge, :EXPAND, "HORIZONTAL");
+        iup.set(gauge, :SHOWTEXT, "NO");
+
+    val labelVal = iup.val("HORIZONTAL")
+        iup.set(labelVal, :EXPAND, "HORIZONTAL");
+        iup.set(labelVal, :NAME, "VAL");
+        iup.set(labelVal, :MAX, "60.0");
+        iup.set(labelVal, :STEP, ".1");
+        iup.set(labelVal, :VALUE, "30.0");
+        iup.set(labelVal, :PAGESTEP, ".5");
+
+    val butReset = iup.button("Reset")
+        iup.set(butReset, "EXPAND", "HORIZONTAL");
+        iup.set(butReset, "NAME", "BUTTON");
+;;;
+    val timer = iup.timer()
+        iup.set(timer, :TIME, "100");
+        iup.set(timer, :TOTALELAPSEDTIME, "0");
+        iup.set(timer, :GAUGE, gauge);
+        iup.set(timer, :LABEL, labelTemp_s); 
+        iup.set(timer, :VAL, labelVal);
+;;;
+    val hbox1 = iup.hbox()
+        iup.append(hbox1, labelET)
+        iup.append(hbox1, gauge)
+        iup.set(hbox1, :MARGIN, "10x10")
+        iup.set(hbox1, :ALIGNMENT, "ACENTER")
+
+    val hbox2 = iup.hbox()
+        iup.append(hbox2, labelDur)
+        iup.append(hbox2, labelVal)
+        iup.set(hbox2, :MARGIN, "10x10")
+        iup.set(hbox2, :ALIGNMENT, "ACENTER")
+
+    val vbox = iup.vbox()
+        iup.append(vbox,hbox1)
+        iup.append(vbox,labelTemp_s)
+        iup.append(vbox,hbox2)
+        iup.append(vbox,butReset)
+        iup.set(vbox, :MARGIN, "10x10")
+        iup.set(vbox, :GAP, "10")
+
+    val dlg = iup.dialog(vbox)
+        iup.set(dlg, :TITLE, "Timer")
+        iup.set(dlg, :SIZE, "200")
+;;        iup.set(dlg, :TIMER, timer)
+
+;;  IupSetCallback(timer, "ACTION_CB", (Icallback)timer_cb);
+;;  IupSetCallback(val, "VALUECHANGED_CB", (Icallback)val_valuechanged_cb);
+;;  IupSetCallback(button, "ACTION", (Icallback)btn_reset_cb);
+
+    iup.show-xy(dlg, `:number IUP_CENTER`, `:number IUP_CENTER`)
+}
+
+iup.loop()
